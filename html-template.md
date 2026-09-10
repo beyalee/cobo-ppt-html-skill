@@ -118,30 +118,24 @@ Reference architecture for generating slide presentations. Every presentation fo
            =========================================== */
       class SlidePresentation {
         constructor() {
-          this.slides = document.querySelectorAll(".slide");
+          this.slides = Array.from(document.querySelectorAll(".slide"));
           this.currentSlide = 0;
+          this.isScrolling = false;
+          this.navLock = false; // true while an explicit goTo() scroll is in flight
+          this._navTimer = null;
+          this._settleTimer = null;
+          this.navDotsContainer = document.getElementById("navDots");
+          this.progressBar = document.getElementById("progressBar");
+          this.counter = document.getElementById("slideCounter");
+
+          this.setupNavDots();
+          this.setupChapterTabs();
           this.setupIntersectionObserver();
           this.setupKeyboardNav();
+          this.setupWheelNav();
           this.setupTouchNav();
-          this.setupProgressBar();
-          this.setupNavDots();
-        }
-
-        setupIntersectionObserver() {
-          // Add .visible class when slides enter viewport
-          // Triggers CSS animations efficiently
-        }
-
-        setupKeyboardNav() {
-          // Arrow keys, Space, Page Up/Down
-        }
-
-        setupTouchNav() {
-          // Touch/swipe support for mobile
-        }
-
-        setupProgressBar() {
-          // Update progress bar on scroll
+          this.setupResizeNav();
+          this.update(0);
         }
 
         setupNavDots() {
@@ -149,11 +143,177 @@ Reference architecture for generating slide presentations. Every presentation fo
           // captured while dots were rendered, re-opening the file would
           // append a duplicate set on top of the existing ones.
           this.navDotsContainer.innerHTML = "";
-          // Generate and manage navigation dots
+          this.slides.forEach((_, i) => {
+            const dot = document.createElement("button");
+            dot.className = "nav-dot";
+            dot.setAttribute("aria-label", "第 " + (i + 1) + " 页");
+            dot.addEventListener("click", () => this.goTo(i));
+            this.navDotsContainer.appendChild(dot);
+          });
+        }
+
+        // Chapter tabs cover slide RANGES; clicking jumps to the range start.
+        setupChapterTabs() {
+          document.querySelectorAll(".tn-ch").forEach((ch) => {
+            ch.addEventListener("click", () => this.goTo(parseInt(ch.dataset.start)));
+          });
+        }
+
+        // Adds .visible to trigger entrance animations, and tracks the current
+        // slide while the user free-scrolls. The tracking half is suppressed
+        // during an explicit goTo(), otherwise slides passing by mid-scroll
+        // overwrite currentSlide and the nav desyncs from what is on screen.
+        setupIntersectionObserver() {
+          const io = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (e.isIntersecting) {
+                  e.target.classList.add("visible");
+                  if (!this.navLock && e.intersectionRatio > 0.5) {
+                    this.update(this.slides.indexOf(e.target));
+                  }
+                }
+              });
+            },
+            { threshold: [0.25, 0.5, 0.75] },
+          );
+          this.slides.forEach((s) => io.observe(s));
+        }
+
+        setupKeyboardNav() {
+          document.addEventListener("keydown", (e) => {
+            // 'Down'/'Up'/… are legacy key names still emitted by some older
+            // browsers and automation drivers — accept both spellings.
+            const k = e.key;
+            if (
+              k === "ArrowDown" || k === "Down" || k === "ArrowRight" ||
+              k === "Right" || k === "PageDown" || k === " " || k === "Spacebar"
+            ) {
+              e.preventDefault();
+              this.goTo(this.currentSlide + 1);
+            } else if (
+              k === "ArrowUp" || k === "Up" || k === "ArrowLeft" ||
+              k === "Left" || k === "PageUp"
+            ) {
+              e.preventDefault();
+              this.goTo(this.currentSlide - 1);
+            } else if (k === "Home") {
+              e.preventDefault();
+              this.goTo(0);
+            } else if (k === "End") {
+              e.preventDefault();
+              this.goTo(this.slides.length - 1);
+            }
+          });
+        }
+
+        // Throttled so one wheel gesture moves exactly one slide.
+        setupWheelNav() {
+          window.addEventListener(
+            "wheel",
+            (e) => {
+              if (this.isScrolling) return;
+              if (Math.abs(e.deltaY) < 12) return;
+              this.isScrolling = true;
+              this.goTo(this.currentSlide + (e.deltaY > 0 ? 1 : -1));
+              setTimeout(() => { this.isScrolling = false; }, 700);
+            },
+            { passive: true },
+          );
+        }
+
+        // Slide offsets are viewport-height multiples, so a resize (or a phone
+        // rotating) leaves the scroll position between slides. Re-anchor.
+        setupResizeNav() {
+          let t = null;
+          window.addEventListener("resize", () => {
+            clearTimeout(t);
+            t = setTimeout(() => {
+              const target = this.slides[this.currentSlide].offsetTop;
+              if (Math.abs(window.scrollY - target) > 2) {
+                window.scrollTo({ top: target, behavior: "instant" });
+              }
+            }, 150);
+          });
+        }
+
+        setupTouchNav() {
+          let startY = 0;
+          window.addEventListener("touchstart", (e) => { startY = e.touches[0].clientY; }, { passive: true });
+          window.addEventListener(
+            "touchend",
+            (e) => {
+              const dy = startY - e.changedTouches[0].clientY;
+              if (Math.abs(dy) > 55) this.goTo(this.currentSlide + (dy > 0 ? 1 : -1));
+            },
+            { passive: true },
+          );
+        }
+
+        goTo(i) {
+          if (i < 0 || i >= this.slides.length) return;
+          this.navLock = true;
+          const target = this.slides[i].offsetTop;
+          const startY = window.scrollY;
+          window.scrollTo({ top: target, behavior: "smooth" });
+          this.update(i);
+
+          clearTimeout(this._settleTimer);
+          clearTimeout(this._navTimer);
+
+          // Watch the scroll settle. Some embedded webviews never run the
+          // smooth-scroll animation at all, so without a fallback the nav
+          // claims a slide the page never reached. But the test must be
+          // "has it STALLED", not "has it arrived" — a healthy smooth scroll
+          // simply hasn't finished yet, and yanking it mid-flight strands the
+          // page between two slides. Only intervene after several consecutive
+          // checks with no movement. A pending smooth scroll still owns the
+          // position and would swallow a plain jump, hence the
+          // cancel-to-current-position before the jump.
+          let last = startY, stalled = 0, ticks = 0;
+          const settle = () => {
+            const y = window.scrollY;
+            if (Math.abs(y - target) <= 2) return; // arrived
+            stalled = Math.abs(y - last) < 1 ? stalled + 1 : 0;
+            last = y;
+            if (stalled >= 3 || ++ticks > 25) {    // ~360ms frozen, or 3s cap
+              window.scrollTo({ top: y, behavior: "instant" });
+              window.scrollTo({ top: target, behavior: "instant" });
+              return;
+            }
+            this._settleTimer = setTimeout(settle, 120);
+          };
+          this._settleTimer = setTimeout(settle, 120);
+
+          this._navTimer = setTimeout(() => { this.navLock = false; }, 900);
+        }
+
+        update(i) {
+          this.currentSlide = i;
+          const total = this.slides.length;
+          const pad = (n) => String(n).padStart(2, "0");
+          this.counter.textContent = pad(i + 1) + " / " + pad(total);
+          this.progressBar.style.width = ((i + 1) / total) * 100 + "%";
+          this.navDotsContainer
+            .querySelectorAll(".nav-dot")
+            .forEach((d, n) => d.classList.toggle("active", n === i));
+          this.updateChapters(i);
+        }
+
+        // A tab is active for EVERY slide inside its [data-start, data-end] range.
+        updateChapters(slideIndex) {
+          document.querySelectorAll(".tn-ch").forEach((ch) => {
+            const s = parseInt(ch.dataset.start);
+            const e = parseInt(ch.dataset.end);
+            ch.classList.toggle("active", slideIndex >= s && slideIndex <= e);
+          });
         }
       }
 
-      new SlidePresentation();
+      const deck = new SlidePresentation();
+
+      // Used by the nav logo — jump back to the cover.
+      function goToSlide(i) { deck.goTo(i); }
     </script>
   </body>
 </html>
@@ -173,6 +333,18 @@ Every presentation must include:
 2. **Intersection Observer** — For scroll-triggered animations:
    - Add `.visible` class when slides enter viewport
    - Trigger CSS transitions efficiently
+
+### Navigation pitfalls (all four have bitten this template)
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Nav counter/tabs update but the page never moves | `overflow-x:hidden` on `<body>` forces its `overflow-y` to `auto`, so **body** becomes the scroller while snap/behavior sit on `<html>` | Keep `overflow-x` and `height:100%` on `<html>` only; `body { min-height:100% }` |
+| Only the first slide renders; the rest are clipped | `height:100%` on `<body>` clamps it to one screen | Same as above |
+| Content sits ~15px left of centre; a horizontal scrollbar appears | `.slide { width:100vw }` — `100vw` includes the scrollbar | `.slide { width:100% }` |
+| Nav highlights a slide the page isn't on | IntersectionObserver overwrites `currentSlide` with slides passing by mid-scroll | `navLock` flag, set in `goTo()`, checked in the observer |
+| Page lands between two slides | A settle-fallback that fires on "hasn't arrived" interrupts a healthy smooth scroll | Fire only on "hasn't **moved**" — see `settle()` in `goTo()` |
+
+Verify after generating: every `goTo(i)` must come to rest at exactly `slides[i].offsetTop`, and `document.documentElement.scrollWidth` must equal `clientWidth`.
 
 3. **Optional Enhancements** (match to chosen style):
    - Custom cursor with trail

@@ -53,6 +53,8 @@ Based on the user's input, output a slide outline:
 结语 (1-2)
 ```
 
+Keep the outline to **4–6 chapters** between 封面 and 结语 — these become the top nav's chapter tabs verbatim (Phase 3), so an outline with 12 sections produces an unusable nav. Slide count per chapter is free; chapter count is not.
+
 Show the outline and ask: "这个结构看起来合适吗？直接开始生成，还是需要调整？"
 
 Wait for confirmation before generating.
@@ -85,18 +87,49 @@ Wait for confirmation before generating.
     <div class="tn-deck-title">[演示标题]</div>
     <div class="tn-counter" id="slideCounter">01 / N</div>
   </div>
-  <!-- Row 2: one button per slide -->
+  <!-- Row 2: one button per CHAPTER (not per slide) -->
   <div class="tn-row2">
     <button class="tn-ch" data-start="0" data-end="0">
-      <span class="tn-ch-num">01</span><span class="tn-ch-name">封面</span>
+      <span class="tn-ch-num">·</span><span class="tn-ch-name">封面</span>
     </button>
-    <!-- repeat for each slide … -->
+    <button class="tn-ch" data-start="1" data-end="5">
+      <span class="tn-ch-num">01</span><span class="tn-ch-name">章节名</span>
+    </button>
+    <button class="tn-ch" data-start="6" data-end="12">
+      <span class="tn-ch-num">02</span><span class="tn-ch-name">章节名</span>
+    </button>
+    <!-- … 4–6 chapters total, then: -->
+    <button class="tn-ch" data-start="22" data-end="22">
+      <span class="tn-ch-num">·</span><span class="tn-ch-name">结语</span>
+    </button>
   </div>
 </nav>
 <div class="progress-bar" id="progressBar"></div>
 ```
 
-**Row 2 rule**: every slide gets its own `<button>`. `data-start = data-end = 0-based index`. `tn-ch-num` = zero-padded slide number, `tn-ch-name` = short slide title (≤4 Chinese chars or ≤6 English chars).
+**Row 2 rule — chapters, never slides.**
+
+The nav bar exists to show the **structure of the talk**, the way a deck's agenda slide does. It is not a page index.
+
+- **Hard cap: 7 buttons.** Target 4–6. A 23-slide deck still gets ~5 buttons — never 23.
+- Each button covers a **range**: `data-start` / `data-end` = the first and last 0-based slide index of that chapter. Clicking it jumps to `data-start`; the button stays `.active` for every slide in the range.
+- `tn-ch-num` = the chapter number, zero-padded (`01`, `02`, …). For the cover and the closing slide use `·` instead of a number — they are not chapters.
+- `tn-ch-name` = chapter name, ≤5 Chinese chars or ≤10 English chars.
+- Every slide index from `0` to `N-1` must fall inside exactly one range — no gaps, no overlaps.
+
+**Deriving the chapters**: reuse the outline you confirmed in Phase 2. Its top-level sections *are* the chapters. If that outline has more than 6 sections, group the neighbouring ones; if it has fewer than 3, split the longest.
+
+Per-slide position is not lost — the `tn-counter` in row 1 shows the exact `07 / 23`, and the progress bar tracks it continuously.
+
+**Example — a 23-slide deck:**
+```
+·  封面      data-start="0"  data-end="0"
+01 市场背景   data-start="1"  data-end="4"
+02 产品能力   data-start="5"  data-end="11"
+03 集成方案   data-start="12" data-end="17"
+04 商务与支持 data-start="18" data-end="21"
+·  结语      data-start="22" data-end="22"
+```
 
 **Each slide must have** `padding-top: var(--nav-h)` to not hide under the nav.
 

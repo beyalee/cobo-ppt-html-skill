@@ -4,20 +4,32 @@
    These styles ensure slides fit exactly in the viewport.
    =========================================== */
 
-/* 1. Lock html/body to viewport */
-html, body {
+/* 1. The viewport (<html>) is the ONE AND ONLY scroll container.
+      Never put `overflow-x: hidden` or `height: 100%` on <body>:
+        - overflow-x:hidden forces body's overflow-y from `visible` to `auto`
+          (CSS overflow spec), making <body> a SECOND scroll container while
+          scroll-snap and scroll-behavior sit on <html>. Programmatic
+          navigation then updates the nav but never moves the page.
+        - height:100% clamps body to one screen, clipping every slide after
+          the first.
+      Both symptoms look like broken JS. Both are pure CSS. */
+html {
     height: 100%;
     overflow-x: hidden;
-}
-
-html {
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
 }
 
+body {
+    min-height: 100%;
+}
+
 /* 2. Each slide = exact viewport height */
 .slide {
-    width: 100vw;
+    /* width:100% NOT 100vw — 100vw includes the vertical scrollbar, so every
+       slide sits ~15px wider than the content area, shifting content
+       off-centre and forcing a horizontal scrollbar. */
+    width: 100%;
     height: 100vh;
     height: 100dvh; /* Dynamic viewport height for mobile browsers */
     overflow: hidden; /* CRITICAL: Prevent ANY overflow */

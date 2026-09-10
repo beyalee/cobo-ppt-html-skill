@@ -97,7 +97,9 @@ Scale by changing `width`/`height` proportionally (ratio is 92:28 ≈ 3.29:1). N
 
 ## Fixed Top Navigation Bar
 
-**Required on every presentation. Two-row design: row 1 = logo + deck title + counter; row 2 = per-slide chapter tabs.**
+**Required on every presentation. Two-row design: row 1 = logo + deck title + counter; row 2 = chapter tabs.**
+
+Row 2 shows the deck's **chapters** — 4–6 of them, 7 absolute maximum — not its slides. See the rule under the HTML below.
 
 ```
 --nav-h: 78px   (row1=36px + row2=42px)
@@ -119,24 +121,33 @@ Scale by changing `width`/`height` proportionally (ratio is 92:28 ≈ 3.29:1). N
     <div class="tn-counter" id="slideCounter">01 / N</div>
   </div>
 
-  <!-- Row 2: one button per slide, data-start = data-end = that slide's 0-based index -->
+  <!-- Row 2: one button per CHAPTER; data-start / data-end = that chapter's slide range -->
   <div class="tn-row2">
     <button class="tn-ch" data-start="0" data-end="0">
-      <span class="tn-ch-num">01</span>
+      <span class="tn-ch-num">·</span>
       <span class="tn-ch-name">封面</span>
     </button>
-    <button class="tn-ch" data-start="1" data-end="1">
+    <button class="tn-ch" data-start="1" data-end="5">
+      <span class="tn-ch-num">01</span>
+      <span class="tn-ch-name">章节名称</span>
+    </button>
+    <button class="tn-ch" data-start="6" data-end="12">
       <span class="tn-ch-num">02</span>
       <span class="tn-ch-name">章节名称</span>
     </button>
-    <!-- one <button> per slide; number = zero-padded slide number -->
+    <!-- 4–6 chapters total, plus 封面 / 结语 -->
   </div>
 
 </nav>
 <div class="progress-bar" id="progressBar"></div>
 ```
 
-> **Rule**: Every slide gets its own button in `.tn-row2`. Set `data-start` and `data-end` to the same 0-based index. The number label (`tn-ch-num`) is the slide number zero-padded to 2 digits.
+> **Rule**: `.tn-row2` holds **chapters, not slides** — it is the deck's agenda, not a page index.
+> Target 4–6 buttons, hard cap 7, regardless of deck length: a 23-slide deck gets ~5 buttons, never 23.
+> `data-start` / `data-end` are the first and last 0-based slide indices of the chapter; clicking jumps to
+> `data-start` and the button stays `.active` across the whole range. Ranges must tile every slide with
+> no gaps or overlaps. `tn-ch-num` is the zero-padded chapter number, or `·` for 封面 / 结语.
+> Exact page position lives in `tn-counter` (`07 / 23`) and the progress bar, so nothing is lost.
 
 ### CSS
 
@@ -682,6 +693,7 @@ Emoji look unprofessional and render inconsistently across systems. Cobo.com use
 - ❌ Use Inter, Roboto, or system fonts
 - ❌ Use purple gradients on white backgrounds
 - ❌ Use emoji as icons — always use inline SVG line-art (see Icon System above)
+- ❌ Give every slide its own nav button — row 2 holds 4–6 **chapters**, never one tab per page
 - ❌ Let slide content scroll
 - ❌ Cram more than 6 bullet points per slide
 - ❌ Show the style selection phase (always use Cobo Brand)
