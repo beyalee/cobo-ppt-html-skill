@@ -548,7 +548,19 @@ Use for: payment flows, process steps, data pipelines.
 }
 @media (max-height: 600px) {
   :root { --pad:clamp(0.5rem,1.8vw,1.1rem); --gap:clamp(0.2rem,0.65vw,0.55rem); --body-size:clamp(0.6rem,0.92vw,0.78rem); }
-  .nav-dots, .tn-chapters { display:none; }
+  .nav-dots { display:none; }
+}
+/* Narrow screens: drop the chapter NUMBER, never the name.
+   A nav reading "01 02 03 04" tells the reader nothing — the name is the
+   content of the tab, the number is only decoration. */
+@media (max-width: 760px) {
+  .tn-ch-num { display:none; }
+  .tn-ch { padding:0 3px; }
+  .tn-ch-name {
+    display:block; width:100%; text-align:center;
+    font-size:clamp(0.5rem, 2.5vw, 0.68rem);
+    overflow:hidden; text-overflow:ellipsis;
+  }
 }
 @media (max-height: 500px) {
   :root { --pad:clamp(0.35rem,1.3vw,0.75rem); --title-size:clamp(0.95rem,3.2vw,1.4rem); --h2-size:clamp(0.88rem,2.1vw,1.15rem); }
@@ -694,6 +706,7 @@ Emoji look unprofessional and render inconsistently across systems. Cobo.com use
 - ❌ Use purple gradients on white backgrounds
 - ❌ Use emoji as icons — always use inline SVG line-art (see Icon System above)
 - ❌ Give every slide its own nav button — row 2 holds 4–6 **chapters**, never one tab per page
+- ❌ Let the nav show bare numbers (`01 02 03 04`) — every tab must carry a name that summarises its chapter; when space is tight, hide `.tn-ch-num`, never `.tn-ch-name`
 - ❌ Let slide content scroll
 - ❌ Cram more than 6 bullet points per slide
 - ❌ Show the style selection phase (always use Cobo Brand)

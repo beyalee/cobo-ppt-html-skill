@@ -113,8 +113,9 @@ The nav bar exists to show the **structure of the talk**, the way a deck's agend
 
 - **Hard cap: 7 buttons.** Target 4–6. A 23-slide deck still gets ~5 buttons — never 23.
 - Each button covers a **range**: `data-start` / `data-end` = the first and last 0-based slide index of that chapter. Clicking it jumps to `data-start`; the button stays `.active` for every slide in the range.
-- `tn-ch-num` = the chapter number, zero-padded (`01`, `02`, …). For the cover and the closing slide use `·` instead of a number — they are not chapters.
-- `tn-ch-name` = chapter name, ≤5 Chinese chars or ≤10 English chars.
+- `tn-ch-name` = the chapter name, and it **must summarise what that chapter is about** — it is the only thing the reader can actually navigate by. ≤5 Chinese chars or ≤10 English chars. Never a generic placeholder (`第一部分`, `Part 1`, `章节一`) and never the number alone; if a chapter cannot be named in 5 characters, the chapter is too broad — split or re-cut it.
+  - Good: `监管背景` `规则要求` `操作流程` `合规联动` · Bad: `第一部分` `背景` `其他` `01`
+- `tn-ch-num` = the chapter number, zero-padded (`01`, `02`, …), shown small above the name. For the cover and the closing slide use `·` instead of a number — they are not chapters. The number is **decoration that orders the names**; it never substitutes for one. On narrow screens the CSS hides the number and keeps the name, never the reverse.
 - Every slide index from `0` to `N-1` must fall inside exactly one range — no gaps, no overlaps.
 
 **Deriving the chapters**: reuse the outline you confirmed in Phase 2. Its top-level sections *are* the chapters. If that outline has more than 6 sections, group the neighbouring ones; if it has fewer than 3, split the longest.
