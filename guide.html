@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cobo Slides · 使用指南</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ===========================================
+   COBO BRAND TOKENS
+   =========================================== */
+:root{
+  --bg:#0d0d0d; --bg-card:#161616; --bg-card2:#1c1c1c; --bg-code:#111;
+  --purple:#7C7FE8; --purple-dim:rgba(124,127,232,.14); --purple-border:rgba(124,127,232,.28);
+  --text:#fff; --text-sec:#888; --text-muted:#3a3a3a;
+  --border:rgba(255,255,255,.07); --border-med:rgba(255,255,255,.11);
+  --font:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --topbar-h:56px;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--topbar-h) + 20px)}
+body{
+  font-family:var(--font); background:var(--bg); color:var(--text);
+  -webkit-font-smoothing:antialiased; line-height:1.65;
+}
+a{color:var(--purple); text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ===========================================
+   TOP BAR
+   =========================================== */
+.topbar{
+  position:fixed; top:0; left:0; right:0; height:var(--topbar-h); z-index:100;
+  background:rgba(13,13,13,.92); backdrop-filter:blur(16px) saturate(120%);
+  -webkit-backdrop-filter:blur(16px) saturate(120%);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:16px; padding:0 clamp(16px,3vw,32px);
+}
+.tb-logo{display:flex; align-items:center; flex-shrink:0}
+.tb-div{width:1px; height:16px; background:var(--border-med); flex-shrink:0}
+.tb-title{font-size:.82rem; font-weight:600; letter-spacing:.02em; white-space:nowrap}
+.tb-spacer{flex:1}
+.tb-link{
+  font-size:.72rem; font-weight:600; color:var(--text-sec);
+  border:1px solid var(--border); border-radius:20px; padding:4px 12px;
+  white-space:nowrap; transition:border-color .2s,color .2s;
+}
+.tb-link:hover{border-color:var(--purple-border); color:var(--text); text-decoration:none}
+
+/* ===========================================
+   LAYOUT
+   =========================================== */
+.shell{
+  max-width:1180px; margin:0 auto; padding:var(--topbar-h) clamp(16px,3vw,32px) 80px;
+  display:grid; grid-template-columns:212px minmax(0,1fr); gap:clamp(24px,4vw,56px);
+  align-items:start;
+}
+
+/* Sidebar TOC */
+.toc{position:sticky; top:calc(var(--topbar-h) + 28px); padding-top:28px}
+.toc-lbl{
+  font-size:.58rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--text-muted); margin-bottom:10px;
+}
+.toc a{
+  display:block; font-size:.78rem; color:var(--text-sec); padding:5px 0 5px 12px;
+  border-left:1px solid var(--border); transition:color .18s,border-color .18s;
+}
+.toc a:hover{color:var(--text); text-decoration:none}
+.toc a.active{color:var(--purple); border-left-color:var(--purple); font-weight:600}
+
+.main{padding-top:28px; min-width:0}
+
+/* ===========================================
+   HERO
+   =========================================== */
+.hero{padding:clamp(20px,4vw,44px) 0 clamp(24px,4vw,40px); border-bottom:1px solid var(--border); margin-bottom:clamp(28px,4vw,48px)}
+.chip{
+  display:inline-flex; font-size:.6rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--purple); border:1px solid var(--purple-border); background:var(--purple-dim);
+  padding:3px 11px; border-radius:20px; margin-bottom:16px;
+}
+h1{font-size:clamp(1.7rem,4.2vw,2.9rem); font-weight:800; letter-spacing:-.03em; line-height:1.08}
+.hl{color:var(--purple)}
+.lede{font-size:clamp(.88rem,1.5vw,1.02rem); color:var(--text-sec); margin-top:14px; max-width:62ch}
+
+/* ===========================================
+   SECTIONS
+   =========================================== */
+section{margin-bottom:clamp(36px,5vw,60px); scroll-margin-top:calc(var(--topbar-h) + 24px)}
+h2{
+  font-size:clamp(1.12rem,2.1vw,1.5rem); font-weight:700; letter-spacing:-.02em;
+  display:flex; align-items:baseline; gap:10px; margin-bottom:6px;
+}
+h2 .num{font-size:.62rem; font-weight:700; color:var(--purple); letter-spacing:.1em; flex-shrink:0}
+h3{font-size:.95rem; font-weight:700; margin:22px 0 8px}
+.glow-line{width:44px; height:2px; background:linear-gradient(90deg,var(--purple),#a5a8ff); border-radius:2px; margin-bottom:18px}
+p{font-size:.86rem; color:var(--text-sec); margin-bottom:12px; max-width:70ch}
+strong{color:var(--text); font-weight:600}
+
+ul,ol{margin:0 0 14px; padding-left:0; list-style:none}
+li{font-size:.86rem; color:var(--text-sec); padding-left:1.2em; position:relative; margin-bottom:6px}
+ul li::before{content:'·'; position:absolute; left:.25em; color:var(--purple); font-weight:700}
+ol{counter-reset:n}
+ol li{counter-increment:n}
+ol li::before{content:counter(n); position:absolute; left:0; color:var(--purple); font-weight:700; font-size:.74rem}
+
+/* ===========================================
+   CODE BLOCKS
+   =========================================== */
+.code{position:relative; margin:12px 0 18px}
+.code pre{
+  background:var(--bg-code); border:1px solid var(--border); border-radius:8px;
+  padding:14px 52px 14px 16px; overflow-x:auto;
+}
+.code code{font-family:var(--mono); font-size:.78rem; color:#d6d6e6; white-space:pre; line-height:1.7}
+.code .cm{color:#5a5a6e}
+.copy{
+  position:absolute; top:9px; right:9px;
+  background:var(--bg-card2); border:1px solid var(--border-med); border-radius:6px;
+  color:var(--text-sec); font-family:var(--font); font-size:.62rem; font-weight:600;
+  padding:4px 9px; cursor:pointer; transition:all .18s;
+}
+.copy:hover{border-color:var(--purple-border); color:var(--text)}
+.copy.done{color:var(--purple); border-color:var(--purple-border)}
+code.inline{
+  font-family:var(--mono); font-size:.78em; background:rgba(255,255,255,.06);
+  border:1px solid var(--border); border-radius:4px; padding:1px 5px; color:#c9c9dd;
+}
+
+/* ===========================================
+   CARDS / GRIDS
+   =========================================== */
+.g2{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:14px 0 18px}
+.g3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0 18px}
+.card{background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:16px; transition:border-color .2s,background .2s}
+.card:hover{border-color:var(--purple-border); background:var(--bg-card2)}
+.card-t{font-size:.9rem; font-weight:700; margin-bottom:6px}
+.card-k{font-size:.58rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--purple); margin-bottom:8px}
+.card p,.card li{font-size:.78rem; margin-bottom:5px}
+.card p:last-child,.card li:last-child{margin-bottom:0}
+
+.hbox{
+  background:rgba(124,127,232,.07); border:1px solid var(--purple-border); border-radius:8px;
+  padding:14px 16px; margin:16px 0; font-size:.84rem; color:var(--text-sec);
+}
+.hbox strong{color:var(--text)}
+.warn{background:rgba(255,180,80,.06); border-color:rgba(255,180,80,.3)}
+.warn .k{color:#ffb450; font-weight:700}
+
+/* ===========================================
+   TABLE
+   =========================================== */
+.tw{overflow-x:auto; margin:14px 0 18px; border:1px solid var(--border); border-radius:8px}
+table{border-collapse:collapse; width:100%; min-width:520px}
+th,td{text-align:left; padding:10px 14px; font-size:.78rem; border-bottom:1px solid var(--border); vertical-align:top}
+th{background:var(--bg-card); color:var(--text); font-weight:700; font-size:.72rem; letter-spacing:.03em; white-space:nowrap}
+td{color:var(--text-sec)}
+tr:last-child td{border-bottom:none}
+td strong{color:var(--text)}
+
+/* ===========================================
+   NAV BAR DEMO (mini mock of what gets generated)
+   =========================================== */
+.demo{border:1px solid var(--border); border-radius:10px; overflow:hidden; margin:14px 0 10px; background:var(--bg)}
+.demo-r1{display:flex; align-items:center; gap:12px; padding:0 14px; height:34px; border-bottom:1px solid var(--border)}
+.demo-title{flex:1; font-size:.62rem; color:var(--text-sec); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.demo-count{font-size:.56rem; font-weight:600; color:var(--text-sec); letter-spacing:.1em; background:rgba(255,255,255,.04); border:1px solid var(--border); padding:2px 8px; border-radius:20px}
+.demo-r2{display:flex; height:40px}
+.demo-ch{
+  flex:1; border-right:1px solid var(--border); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:2px; cursor:default; padding:0 4px;
+}
+.demo-ch:last-child{border-right:none}
+.demo-n{font-size:.5rem; font-weight:700; color:var(--text-muted); letter-spacing:.12em}
+.demo-nm{font-size:.62rem; font-weight:500; color:var(--text-sec); white-space:nowrap}
+.demo-ch.on{background:rgba(124,127,232,.08)}
+.demo-ch.on .demo-n{color:var(--purple)}
+.demo-ch.on .demo-nm{color:var(--text); font-weight:600}
+.demo-bar{height:2px; background:linear-gradient(90deg,var(--purple),#a5a8ff); width:33%}
+.demo-cap{font-size:.7rem; color:var(--text-muted); margin-bottom:18px}
+
+.bad{color:#e8737f}
+.good{color:#68d391}
+
+/* ===========================================
+   TREE
+   =========================================== */
+.tree{background:var(--bg-code); border:1px solid var(--border); border-radius:8px; padding:14px 16px; overflow-x:auto}
+.tree code{font-family:var(--mono); font-size:.75rem; color:#d6d6e6; white-space:pre; line-height:1.85}
+.tree .c{color:#5a5a6e}
+
+footer{
+  border-top:1px solid var(--border); margin-top:20px; padding-top:22px;
+  font-size:.74rem; color:var(--text-muted);
+}
+
+/* ===========================================
+   RESPONSIVE
+   =========================================== */
+@media (max-width:880px){
+  .shell{grid-template-columns:1fr; gap:0}
+  .toc{
+    position:static; padding:20px 0 0; margin-bottom:8px;
+    display:flex; gap:6px; overflow-x:auto; scrollbar-width:none;
+  }
+  .toc::-webkit-scrollbar{display:none}
+  .toc-lbl{display:none}
+  .toc a{
+    border-left:none; border:1px solid var(--border); border-radius:20px;
+    padding:5px 12px; white-space:nowrap; font-size:.72rem;
+  }
+  .toc a.active{border-color:var(--purple-border); background:var(--purple-dim)}
+  .main{padding-top:12px}
+  .g2,.g3{grid-template-columns:1fr}
+}
+@media (max-width:520px){
+  .demo-n{display:none}
+  .tb-title{font-size:.72rem}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-logo">
+    <svg width="60" height="18" viewBox="0 0 92 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block"><path d="M63.054 17.2847C63.054 14.0335 60.4155 11.3966 57.1644 11.3981C53.9132 11.3981 51.2763 14.0365 51.2778 17.2877C51.2778 20.5389 53.9147 23.1743 57.1659 23.1743C60.4171 23.1743 63.054 20.5374 63.054 17.2862V17.2847ZM91.3344 17.2847C91.3299 23.1971 86.5316 27.9863 80.6191 27.9817C76.2218 27.9786 72.2725 25.2853 70.6644 21.1928L74.7402 17.117V17.2862C74.7478 20.5328 77.3863 23.1575 80.6329 23.1484C83.8795 23.1392 86.5042 20.5023 86.495 17.2557C86.4874 14.0091 83.849 11.3844 80.6024 11.3935C79.0492 11.3981 77.56 12.0154 76.4626 13.1144L64.7779 24.8052C60.635 29.0136 53.8644 29.0669 49.6545 24.9241C47.6075 22.9091 46.4582 20.1563 46.4628 17.2847V2.26495C46.5451 0.934302 47.6898 -0.0762592 49.0189 0.00452475C50.2352 0.0792118 51.2031 1.04862 51.2793 2.26495V8.27192C56.2178 5.02075 62.8573 6.38951 66.1085 11.328C66.8539 12.4605 67.3767 13.7241 67.651 15.0517L73.059 9.64525C77.2384 5.4643 84.0166 5.46278 88.1976 9.6422C90.2233 11.6679 91.3543 14.4207 91.3344 17.2847ZM44.8593 17.2847C44.87 23.191 40.0915 27.9893 34.1836 28C29.7695 28.0091 25.8034 25.3036 24.1999 21.1928L28.2757 17.117V17.2862C28.2833 20.5328 30.9218 23.1575 34.1684 23.1484C37.415 23.1407 40.0397 20.5023 40.0305 17.2557C40.0229 14.0091 37.3845 11.3844 34.1379 11.3935C32.5847 11.3981 31.0955 12.0154 29.9981 13.1144L18.2722 24.8509C14.0913 29.0303 7.31304 29.0288 3.13362 24.8479C-1.04581 20.6669 -1.04428 13.8887 3.13667 9.70927C7.31609 5.53137 14.0928 5.53137 18.2722 9.70927C19.2127 10.6543 19.2081 12.1846 18.2616 13.1235C17.3165 14.064 15.7862 14.0594 14.8473 13.1129C12.5442 10.8174 8.81593 10.8235 6.52045 13.1266C4.22496 15.4297 4.23106 19.1579 6.53416 21.4534C8.8327 23.7443 12.5503 23.7443 14.8473 21.4534L26.593 9.67726C30.7648 5.49631 37.5369 5.48869 41.7194 9.66049C43.7436 11.6801 44.8745 14.4267 44.8593 17.2877V17.2831V17.2847Z" fill="white"/></svg>
+  </div>
+  <div class="tb-div"></div>
+  <div class="tb-title">Slides 使用指南</div>
+  <div class="tb-spacer"></div>
+  <a class="tb-link" href="https://github.com/beyalee/cobo-ppt-html-skill" target="_blank" rel="noopener">GitHub ↗</a>
+</div>
+
+<div class="shell">
+
+  <!-- ============ SIDEBAR TOC ============ -->
+  <nav class="toc" id="toc" aria-label="目录">
+    <div class="toc-lbl">目录</div>
+    <a href="#what">这是什么</a>
+    <a href="#install">安装</a>
+    <a href="#usage">三种用法</a>
+    <a href="#flow">Claude 的四个阶段</a>
+    <a href="#output">生成效果</a>
+    <a href="#nav">导航条规则</a>
+    <a href="#keys">放映操作</a>
+    <a href="#export">导出与部署</a>
+    <a href="#files">文件结构</a>
+    <a href="#customize">定制</a>
+    <a href="#trouble">故障排查</a>
+  </nav>
+
+  <main class="main">
+
+    <div class="hero">
+      <div class="chip">Claude Code Skill</div>
+      <h1>输入一个主题<br>拿到一份<span class="hl">能直接讲的 HTML</span></h1>
+      <p class="lede">
+        Cobo Slides 是一个 Claude Code 技能。装好之后，你只要说清楚要讲什么、讲给谁，
+        Claude 会问几个问题、和你确认大纲，然后产出一个<strong>零依赖的单文件 HTML</strong> ——
+        符合 Cobo 官网配色、每页锁定一屏、离线可用、能导出 PDF。
+      </p>
+    </div>
+
+    <!-- ============ 1 ============ -->
+    <section id="what">
+      <h2><span class="num">01</span>这是什么</h2>
+      <div class="glow-line"></div>
+      <p>
+        它不是一个程序，而是一套<strong>给 Claude 读的说明书</strong>：品牌规范、组件库、版式约束、JS 控制器实现。
+        Claude 每次生成前都会完整读一遍，所以你改了品牌色，下一份 deck 立刻跟着变。
+      </p>
+      <div class="g3">
+        <div class="card">
+          <div class="card-k">产出</div>
+          <div class="card-t">单个 .html</div>
+          <p>CSS / JS 全内联，只有 Google Fonts 走 CDN。丢给别人双击就能看。</p>
+        </div>
+        <div class="card">
+          <div class="card-k">约束</div>
+          <div class="card-t">每页正好一屏</div>
+          <p>内容超了自动拆页，绝不滚动、绝不硬塞。</p>
+        </div>
+        <div class="card">
+          <div class="card-k">语言</div>
+          <div class="card-t">中文优先</div>
+          <p>默认简体中文，除非你给的是别的语言。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 2 ============ -->
+    <section id="install">
+      <h2><span class="num">02</span>安装</h2>
+      <div class="glow-line"></div>
+      <p>克隆到 Claude Code 的技能目录即可，<strong>无需重启</strong>，Claude 会自动识别。</p>
+      <div class="code">
+        <button class="copy">复制</button>
+        <pre><code>git clone https://github.com/beyalee/cobo-ppt-html-skill ~/.claude/skills/cobo-slides</code></pre>
+      </div>
+      <div class="hbox warn">
+        <span class="k">注意</span> 仓库原名 <code class="inline">cobo-slides</code>，现已更名为
+        <code class="inline">cobo-ppt-html-skill</code>。旧地址目前靠 GitHub 重定向仍可 clone，
+        但建议直接用新地址。<strong>本地目录名仍用 <code class="inline">cobo-slides</code></strong> ——
+        技能名由目录名决定。
+      </div>
+      <h3>更新到最新版</h3>
+      <div class="code">
+        <button class="copy">复制</button>
+        <pre><code>git -C ~/.claude/skills/cobo-slides pull</code></pre>
+      </div>
+    </section>
+
+    <!-- ============ 3 ============ -->
+    <section id="usage">
+      <h2><span class="num">03</span>三种用法</h2>
+      <div class="glow-line"></div>
+
+      <h3>① 只给主题，让它全写</h3>
+      <p>最省事。Claude 会先问受众、页数、章节，再动手。</p>
+      <div class="code">
+        <button class="copy">复制</button>
+        <pre><code>帮我做一个 Cobo MPC 钱包的客户演示</code></pre>
+      </div>
+
+      <h3>② 给大纲或全文，只要排版</h3>
+      <p>你已经想清楚讲什么，把要点贴给它，它负责版式与视觉。</p>
+      <div class="code">
+        <button class="copy">复制</button>
+        <pre><code>按这个大纲做一份 deck，面向合规团队：
+1. 监管背景  2. 规则要求  3. 操作流程  4. 合规联动</code></pre>
+      </div>
+
+      <h3>③ 把现有 PDF / PPT 转成 HTML</h3>
+      <p>Claude 会把 PDF 逐页转图读取、或用 <code class="inline">python-pptx</code> 抽取文字，再按品牌规范重排。</p>
+      <div class="code">
+        <button class="copy">复制</button>
+        <pre><code>把这份 PPT 转成 HTML @产品介绍.pdf</code></pre>
+      </div>
+      <div class="hbox">
+        转换是<strong>重排不是复刻</strong>：它保留内容与结构，但版式会套用 Cobo 规范。
+        想保留原样请直接用原文件。
+      </div>
+    </section>
+
+    <!-- ============ 4 ============ -->
+    <section id="flow">
+      <h2><span class="num">04</span>Claude 的四个阶段</h2>
+      <div class="glow-line"></div>
+      <ol>
+        <li><strong>问需求</strong> —— 主题、受众、内容来源、页数、章节，一次性问完。</li>
+        <li><strong>出大纲</strong> —— 给出分章与页数分配，<strong>等你确认</strong>再往下走。这一步值得认真看：大纲的顶层章节会原样变成导航条的 Tab。</li>
+        <li><strong>生成 HTML</strong> —— 读取品牌规范与模板，产出单文件。</li>
+        <li><strong>交付</strong> —— 打开预览，并问你要不要导出 PDF 或部署成公网链接。</li>
+      </ol>
+      <div class="hbox">
+        阶段 2 的大纲限制在 <strong>4–6 个章节</strong>。不是排版洁癖 —— 章节数直接决定导航条可不可用，见下一节。
+      </div>
+    </section>
+
+    <!-- ============ 5 ============ -->
+    <section id="output">
+      <h2><span class="num">05</span>生成效果</h2>
+      <div class="glow-line"></div>
+      <div class="tw">
+        <table>
+          <thead><tr><th>项</th><th>规格</th></tr></thead>
+          <tbody>
+            <tr><td><strong>背景</strong></td><td><code class="inline">#0d0d0d</code> 近黑，卡片 <code class="inline">#161616</code>，与 cobo.com 一致</td></tr>
+            <tr><td><strong>强调色</strong></td><td><code class="inline">#7C7FE8</code> 紫，与官网 "trusted" 同色；CTA 蓝 <code class="inline">#3D50F5</code></td></tr>
+            <tr><td><strong>字体</strong></td><td>Plus Jakarta Sans（正文）+ Varela Round（标志）</td></tr>
+            <tr><td><strong>版心</strong></td><td>每页 <code class="inline">100dvh</code>，scroll-snap 逐页对齐，绝不滚动</td></tr>
+            <tr><td><strong>图标</strong></td><td>一律内联 SVG 线性图标，<span class="bad">禁止 emoji</span></td></tr>
+            <tr><td><strong>动画</strong></td><td>入场淡入 + 8 级错峰延迟，尊重 <code class="inline">prefers-reduced-motion</code></td></tr>
+            <tr><td><strong>响应式</strong></td><td>桌面 / 平板 / 手机，含超短视口降级</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>内置组件</h3>
+      <p>统计卡、Tier 卡、能力卡、流程图、架构分层、模块宫格、案例布局、高亮框、合作方 chips —— Claude 会按内容类型自动选用，你也可以直接点名要哪个。</p>
+    </section>
+
+    <!-- ============ 6 ============ -->
+    <section id="nav">
+      <h2><span class="num">06</span>导航条规则</h2>
+      <div class="glow-line"></div>
+      <p>顶部导航条给的是<strong>整场演讲的结构</strong>，不是页码索引。它永远只有 4–6 个章节 Tab，硬上限 7 个 —— 哪怕你的 deck 有 23 页。</p>
+
+      <div class="demo" aria-hidden="true">
+        <div class="demo-r1">
+          <svg width="44" height="13" viewBox="0 0 92 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0"><path d="M63.054 17.2847C63.054 14.0335 60.4155 11.3966 57.1644 11.3981C53.9132 11.3981 51.2763 14.0365 51.2778 17.2877C51.2778 20.5389 53.9147 23.1743 57.1659 23.1743C60.4171 23.1743 63.054 20.5374 63.054 17.2862V17.2847ZM91.3344 17.2847C91.3299 23.1971 86.5316 27.9863 80.6191 27.9817C76.2218 27.9786 72.2725 25.2853 70.6644 21.1928L74.7402 17.117V17.2862C74.7478 20.5328 77.3863 23.1575 80.6329 23.1484C83.8795 23.1392 86.5042 20.5023 86.495 17.2557C86.4874 14.0091 83.849 11.3844 80.6024 11.3935C79.0492 11.3981 77.56 12.0154 76.4626 13.1144L64.7779 24.8052C60.635 29.0136 53.8644 29.0669 49.6545 24.9241C47.6075 22.9091 46.4582 20.1563 46.4628 17.2847V2.26495C46.5451 0.934302 47.6898 -0.0762592 49.0189 0.00452475C50.2352 0.0792118 51.2031 1.04862 51.2793 2.26495V8.27192C56.2178 5.02075 62.8573 6.38951 66.1085 11.328C66.8539 12.4605 67.3767 13.7241 67.651 15.0517L73.059 9.64525C77.2384 5.4643 84.0166 5.46278 88.1976 9.6422C90.2233 11.6679 91.3543 14.4207 91.3344 17.2847ZM44.8593 17.2847C44.87 23.191 40.0915 27.9893 34.1836 28C29.7695 28.0091 25.8034 25.3036 24.1999 21.1928L28.2757 17.117V17.2862C28.2833 20.5328 30.9218 23.1575 34.1684 23.1484C37.415 23.1407 40.0397 20.5023 40.0305 17.2557C40.0229 14.0091 37.3845 11.3844 34.1379 11.3935C32.5847 11.3981 31.0955 12.0154 29.9981 13.1144L18.2722 24.8509C14.0913 29.0303 7.31304 29.0288 3.13362 24.8479C-1.04581 20.6669 -1.04428 13.8887 3.13667 9.70927C7.31609 5.53137 14.0928 5.53137 18.2722 9.70927C19.2127 10.6543 19.2081 12.1846 18.2616 13.1235C17.3165 14.064 15.7862 14.0594 14.8473 13.1129C12.5442 10.8174 8.81593 10.8235 6.52045 13.1266C4.22496 15.4297 4.23106 19.1579 6.53416 21.4534C8.8327 23.7443 12.5503 23.7443 14.8473 21.4534L26.593 9.67726C30.7648 5.49631 37.5369 5.48869 41.7194 9.66049C43.7436 11.6801 44.8745 14.4267 44.8593 17.2877V17.2831V17.2847Z" fill="white"/></svg>
+          <div class="tb-div"></div>
+          <div class="demo-title">Travel Rule · 合规转账要求</div>
+          <div class="demo-count">05 / 16</div>
+        </div>
+        <div class="demo-r2">
+          <div class="demo-ch"><div class="demo-n">·</div><div class="demo-nm">封面</div></div>
+          <div class="demo-ch"><div class="demo-n">01</div><div class="demo-nm">监管背景</div></div>
+          <div class="demo-ch on"><div class="demo-n">02</div><div class="demo-nm">规则要求</div></div>
+          <div class="demo-ch"><div class="demo-n">03</div><div class="demo-nm">操作流程</div></div>
+          <div class="demo-ch"><div class="demo-n">04</div><div class="demo-nm">合规联动</div></div>
+          <div class="demo-ch"><div class="demo-n">·</div><div class="demo-nm">结语</div></div>
+        </div>
+        <div class="demo-bar"></div>
+      </div>
+      <div class="demo-cap">↑ 一份 16 页的 deck，导航条只有 6 个 Tab。精确页码在右上角。</div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="card-k good">正确</div>
+          <div class="card-t">名字概括内容</div>
+          <ul>
+            <li><code class="inline">监管背景</code> <code class="inline">规则要求</code></li>
+            <li><code class="inline">操作流程</code> <code class="inline">合规联动</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-k bad">错误</div>
+          <div class="card-t">空壳或纯数字</div>
+          <ul>
+            <li><code class="inline">第一部分</code> <code class="inline">Part 1</code></li>
+            <li><code class="inline">其他</code> <code class="inline">01</code></li>
+          </ul>
+        </div>
+      </div>
+      <p>
+        每个 Tab 用 <code class="inline">data-start</code> / <code class="inline">data-end</code> 覆盖一段页码区间，
+        区间必须<strong>无缝隙、无重叠</strong>地铺满所有页。名字是内容，编号只负责排序 ——
+        窄屏空间不够时藏的是编号，永远不是名字。
+      </p>
+      <div class="hbox">
+        <strong>5 个字讲不清的章节，说明这章切得太粗</strong> —— 该拆或重切，而不是起个含糊的名字。
+      </div>
+    </section>
+
+    <!-- ============ 7 ============ -->
+    <section id="keys">
+      <h2><span class="num">07</span>放映操作</h2>
+      <div class="glow-line"></div>
+      <div class="tw">
+        <table>
+          <thead><tr><th>操作</th><th>作用</th></tr></thead>
+          <tbody>
+            <tr><td><strong>↓ / → / 空格 / PageDown</strong></td><td>下一页</td></tr>
+            <tr><td><strong>↑ / ← / PageUp</strong></td><td>上一页</td></tr>
+            <tr><td><strong>Home / End</strong></td><td>首页 / 末页</td></tr>
+            <tr><td><strong>滚轮</strong></td><td>一次手势翻一页（已节流）</td></tr>
+            <tr><td><strong>触屏上下滑</strong></td><td>翻页</td></tr>
+            <tr><td><strong>点顶部章节 Tab</strong></td><td>跳到该章第一页</td></tr>
+            <tr><td><strong>点右侧圆点</strong></td><td>跳到指定页</td></tr>
+            <tr><td><strong>点左上 Logo</strong></td><td>回封面</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 8 ============ -->
+    <section id="export">
+      <h2><span class="num">08</span>导出与部署</h2>
+      <div class="glow-line"></div>
+      <h3>导出 PDF</h3>
+      <p>用 Playwright 逐页截取，首次运行会自动装依赖（需要 Node.js）。</p>
+      <div class="code">
+        <button class="copy">复制</button>
+        <pre><code>bash ~/.claude/skills/cobo-slides/scripts/export-pdf.sh my-deck.html <span class="cm"># 可选：追加输出路径</span></code></pre>
+      </div>
+      <h3>部署成公网链接</h3>
+      <p>走 Vercel，需先 <code class="inline">npx vercel login</code>。</p>
+      <div class="code">
+        <button class="copy">复制</button>
+        <pre><code>bash ~/.claude/skills/cobo-slides/scripts/deploy.sh my-deck.html</code></pre>
+      </div>
+      <div class="hbox warn">
+        <span class="k">提醒</span> 部署会把内容发布到公网。含客户名称、报价、未公开路线图的 deck，
+        请先确认可以外发。
+      </div>
+    </section>
+
+    <!-- ============ 9 ============ -->
+    <section id="files">
+      <h2><span class="num">09</span>文件结构</h2>
+      <div class="glow-line"></div>
+      <div class="tree">
+<code>cobo-slides/
+├── SKILL.md              <span class="c"># 主流程：四个阶段 + 导航条规则</span>
+├── COBO_BRAND.md         <span class="c"># 品牌规范：CSS 变量 + 组件库 + 图标 + 产品词汇表</span>
+├── viewport-base.css     <span class="c"># 强制响应式基础样式（必须整段嵌入）</span>
+├── html-template.md      <span class="c"># JS 控制器完整实现 + 踩坑对照表</span>
+├── animation-patterns.md <span class="c"># 动画片段参考</span>
+├── guide.html            <span class="c"># 本文档</span>
+└── scripts/
+    ├── export-pdf.sh     <span class="c"># 导出 PDF</span>
+    └── deploy.sh         <span class="c"># 部署到 Vercel</span></code>
+      </div>
+    </section>
+
+    <!-- ============ 10 ============ -->
+    <section id="customize">
+      <h2><span class="num">10</span>定制</h2>
+      <div class="glow-line"></div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-t">改品牌色 / 加组件</div>
+          <p>编辑 <code class="inline">COBO_BRAND.md</code>。Claude 每次生成前都会读最新版本，改完立即生效。</p>
+        </div>
+        <div class="card">
+          <div class="card-t">改流程 / 改规则</div>
+          <p>编辑 <code class="inline">SKILL.md</code>。比如想调整章节数上限、密度限制或提问方式。</p>
+        </div>
+      </div>
+      <p>改完记得提交，团队其他人 <code class="inline">git pull</code> 就同步了。</p>
+    </section>
+
+    <!-- ============ 11 ============ -->
+    <section id="trouble">
+      <h2><span class="num">11</span>故障排查</h2>
+      <div class="glow-line"></div>
+      <p>下面几个是这套模板真实踩过的坑，修复已写进 <code class="inline">html-template.md</code> 与 <code class="inline">viewport-base.css</code>。自己改代码时留意别改回去。</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>症状</th><th>原因</th><th>修法</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>页码和 Tab 变了，<strong>页面不动</strong></td>
+              <td><code class="inline">body</code> 上的 <code class="inline">overflow-x:hidden</code> 按规范把 <code class="inline">overflow-y</code> 强制成 <code class="inline">auto</code>，body 成了第二个滚动容器</td>
+              <td>overflow 和 <code class="inline">height:100%</code> 只放 <code class="inline">html</code></td>
+            </tr>
+            <tr>
+              <td>只有第一页，后面全没了</td>
+              <td><code class="inline">body{height:100%}</code> 把内容裁到一屏</td>
+              <td>改 <code class="inline">min-height:100%</code></td>
+            </tr>
+            <tr>
+              <td>内容左偏、出现横向滚动条</td>
+              <td><code class="inline">.slide{width:100vw}</code> —— <code class="inline">100vw</code> 含滚动条宽度</td>
+              <td>改 <code class="inline">width:100%</code></td>
+            </tr>
+            <tr>
+              <td>导航高亮的不是当前页</td>
+              <td>IntersectionObserver 在滚动途中覆盖了 <code class="inline">currentSlide</code></td>
+              <td><code class="inline">navLock</code> 标志位</td>
+            </tr>
+            <tr>
+              <td>停在两页中间</td>
+              <td>兜底逻辑按"是否到达"触发，打断了正常的平滑滚动</td>
+              <td>改成按"是否没动"触发</td>
+            </tr>
+            <tr>
+              <td>手机上导航只剩 <code class="inline">01 02 03</code></td>
+              <td>窄屏把 <code class="inline">.tn-ch-name</code> 藏了</td>
+              <td>该藏的是 <code class="inline">.tn-ch-num</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>自检两条</h3>
+      <p>生成后在控制台跑一下，都为 <code class="inline">true</code> 才算过：</p>
+      <div class="code">
+        <button class="copy">复制</button>
+        <pre><code><span class="cm">// 1. 每次跳转都精确停在页首</span>
+deck.goTo(5); <span class="cm">// 等 2 秒后</span>
+window.scrollY === deck.slides[5].offsetTop
+
+<span class="cm">// 2. 没有横向溢出</span>
+document.documentElement.scrollWidth === document.documentElement.clientWidth</code></pre>
+      </div>
+    </section>
+
+    <footer>
+      Cobo Slides · Claude Code Skill ·
+      <a href="https://github.com/beyalee/cobo-ppt-html-skill" target="_blank" rel="noopener">github.com/beyalee/cobo-ppt-html-skill</a>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+/* ---- Copy buttons ---- */
+document.querySelectorAll('.code').forEach(block => {
+  const btn = block.querySelector('.copy');
+  const code = block.querySelector('code');
+  if (!btn || !code) return;
+  btn.addEventListener('click', async () => {
+    const text = code.innerText;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (err) {
+      /* clipboard API needs a secure context — fall back to a temp textarea */
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) { /* give up quietly */ }
+      ta.remove();
+    }
+    btn.textContent = '已复制';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('done'); }, 1600);
+  });
+});
+
+/* ---- TOC scroll-spy ---- */
+(() => {
+  const links = Array.from(document.querySelectorAll('#toc a'));
+  const sections = links
+    .map(a => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean);
+  if (!sections.length) return;
+
+  const setActive = id => {
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+  };
+
+  const io = new IntersectionObserver(entries => {
+    // Pick the entry nearest the top of the viewport among those intersecting.
+    const visible = entries.filter(e => e.isIntersecting);
+    if (!visible.length) return;
+    const top = visible.reduce((a, b) =>
+      a.boundingClientRect.top < b.boundingClientRect.top ? a : b);
+    setActive(top.target.id);
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+
+  sections.forEach(s => io.observe(s));
+  setActive(sections[0].id);
+})();
+</script>
+</body>
+</html>
