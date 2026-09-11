@@ -3,7 +3,9 @@
 > Cobo 品牌 HTML 演示技能，适用于 Claude Code。  
 > 一行命令安装，输入主题，Claude 自动生成符合 Cobo 官网配色的产品演示幻灯片。
 
-📖 **[完整使用指南 → guide.html](guide.html)**（clone 后用浏览器打开，含导航条规则、放映操作、故障排查）
+### 📖 [点这里看使用指南 →](https://beyalee.github.io/cobo-ppt-html-skill/guide.html)
+
+不用 clone，点开就能看。里面有一份**可以直接翻页的示例 deck**，以及安装、用法、交付方式的完整说明。
 
 ---
 
@@ -147,4 +149,4 @@ cobo-slides/
 更新品牌色或新增组件，编辑 `COBO_BRAND.md`；调整流程或规则，编辑 `SKILL.md`。  
 Claude 每次生成前都会读取最新版本，改完立即生效。
 
-`html-template.md` 里的 JS 控制器有几处反直觉的修复（滚动容器、`100vw`、导航同步、落位兜底），改动前先看该文件的踩坑对照表，或 [guide.html](guide.html) 的"故障排查"一节。
+`html-template.md` 里的 JS 控制器有几处反直觉的修复（滚动容器、`100vw`、导航同步、落位兜底），改动前先看该文件末尾的踩坑对照表。
