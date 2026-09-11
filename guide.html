@@ -91,15 +91,35 @@ h1{font-size:clamp(1.7rem,4.2vw,2.9rem); font-weight:800; letter-spacing:-.03em;
 /* ===========================================
    SECTIONS
    =========================================== */
-section{margin-bottom:clamp(36px,5vw,60px); scroll-margin-top:calc(var(--topbar-h) + 24px)}
-h2{
-  font-size:clamp(1.12rem,2.1vw,1.5rem); font-weight:700; letter-spacing:-.02em;
-  display:flex; align-items:baseline; gap:10px; margin-bottom:6px;
+/* Section headings carry the hierarchy: a pill-badge number, a much larger
+   all-white title, and a rule above each section so the eye can find the
+   boundaries while scrolling. */
+section{
+  margin-bottom:clamp(44px,6vw,76px); padding-top:clamp(28px,4vw,44px);
+  border-top:1px solid var(--border);
+  scroll-margin-top:calc(var(--topbar-h) + 24px);
 }
-h2 .num{font-size:.62rem; font-weight:700; color:var(--purple); letter-spacing:.1em; flex-shrink:0}
-h3{font-size:.95rem; font-weight:700; margin:22px 0 8px}
-.glow-line{width:44px; height:2px; background:linear-gradient(90deg,var(--purple),#a5a8ff); border-radius:2px; margin-bottom:18px}
-p{font-size:.86rem; color:var(--text-sec); margin-bottom:12px; max-width:70ch}
+section:first-of-type{border-top:none; padding-top:0}
+h2{
+  font-size:clamp(1.5rem,3.2vw,2.3rem); font-weight:800; letter-spacing:-.03em;
+  color:var(--text); line-height:1.15;
+  display:flex; align-items:center; gap:13px; margin-bottom:12px;
+}
+h2 .num{
+  font-size:.64rem; font-weight:700; color:var(--purple); letter-spacing:.14em;
+  background:var(--purple-dim); border:1px solid var(--purple-border);
+  border-radius:20px; padding:4px 11px; flex-shrink:0; line-height:1;
+}
+h3{
+  font-size:clamp(1rem,1.7vw,1.16rem); font-weight:700; color:var(--text);
+  margin:30px 0 10px; padding-left:12px; position:relative; line-height:1.35;
+}
+h3::before{
+  content:''; position:absolute; left:0; top:.22em; bottom:.22em;
+  width:3px; border-radius:2px; background:linear-gradient(180deg,var(--purple),#a5a8ff);
+}
+.glow-line{width:54px; height:3px; background:linear-gradient(90deg,var(--purple),#a5a8ff); border-radius:2px; margin-bottom:22px}
+p{font-size:.88rem; color:var(--text-sec); margin-bottom:12px; max-width:70ch}
 strong{color:var(--text); font-weight:600}
 
 ul,ol{margin:0 0 14px; padding-left:0; list-style:none}
@@ -214,6 +234,28 @@ td strong{color:var(--text)}
 .cc-cur{display:inline-block; width:7px; height:12px; background:var(--purple); vertical-align:-1px; animation:blink 1.1s step-end infinite}
 @keyframes blink{50%{opacity:0}}
 .cap{font-size:.7rem; color:var(--text-muted); margin-bottom:18px}
+
+/* ===========================================
+   EMBEDDED LIVE DECK
+   A real deck in an iframe, boxed to a fixed height so its own
+   full-viewport scroll-snap can't hijack the page scroll.
+   =========================================== */
+.live{border:1px solid var(--border-med); border-radius:10px; overflow:hidden; background:#0a0a0a; margin:16px 0 10px}
+.live-bar{display:flex; align-items:center; gap:6px; padding:9px 13px; background:#141414; border-bottom:1px solid var(--border)}
+.live-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0}
+.live-url{
+  margin-left:8px; flex:1; font-family:var(--mono); font-size:.62rem; color:var(--text-muted);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.live-open{
+  font-size:.62rem; font-weight:600; color:var(--text-sec); border:1px solid var(--border-med);
+  border-radius:6px; padding:3px 9px; white-space:nowrap; flex-shrink:0; transition:all .18s;
+}
+.live-open:hover{border-color:var(--purple-border); color:var(--text); text-decoration:none}
+/* min-height floors the box: a vh-only height collapses to nothing in any
+   context that reports a zero viewport (some embedded webviews, thumbnailers). */
+.live iframe{display:block; width:100%; height:min(62vh,520px); min-height:320px; border:0; background:var(--bg)}
+@media (max-width:760px){ .live iframe{height:min(56vh,380px); min-height:260px} }
 @media (prefers-reduced-motion:reduce){ .cc-cur{animation:none} }
 
 /* ===========================================
@@ -275,12 +317,11 @@ footer{
   <nav class="toc" id="toc" aria-label="目录">
     <div class="toc-lbl">目录</div>
     <a href="#what">这是什么</a>
+    <a href="#showcase">成果展示</a>
     <a href="#install">安装</a>
-    <a href="#usage">三种用法</a>
+    <a href="#usage">两种用法</a>
+    <a href="#export">三种交付方式</a>
     <a href="#flow">Claude 的四个阶段</a>
-    <a href="#output">生成效果</a>
-    <a href="#nav">导航条规则</a>
-    <a href="#export">导出与部署</a>
   </nav>
 
   <main class="main">
@@ -323,8 +364,51 @@ footer{
     </section>
 
     <!-- ============ 2 ============ -->
+    <section id="showcase">
+      <h2><span class="num">02</span>成果展示</h2>
+      <div class="glow-line"></div>
+      <p>
+        下面是一份<strong>真实的输出</strong> —— 不是截图，是嵌在这一页里的完整 deck。
+        方向键翻页、点顶部章节 Tab 跳转、点右侧圆点选页，都可以直接试。
+      </p>
+
+      <div class="live">
+        <div class="live-bar">
+          <span class="live-dot" style="background:#ff5f57"></span>
+          <span class="live-dot" style="background:#febc2e"></span>
+          <span class="live-dot" style="background:#28c840"></span>
+          <span class="live-url">sample-deck.html</span>
+          <a class="live-open" href="examples/sample-deck.html" target="_blank" rel="noopener">全屏打开 ↗</a>
+        </div>
+        <iframe src="examples/sample-deck.html" title="Cobo 产品概览 · 示例 Deck" loading="lazy"></iframe>
+      </div>
+      <div class="cap">↑ 10 页的 deck，顶部导航条只有 6 个 Tab。嵌在框里所以要先点一下再用键盘。</div>
+
+      <div class="g3">
+        <div class="card">
+          <div class="card-k">体量</div>
+          <div class="card-t">一个文件</div>
+          <p>CSS / JS 全内联，只有 Google Fonts 走 CDN。发给谁都能双击打开。</p>
+        </div>
+        <div class="card">
+          <div class="card-k">版式</div>
+          <div class="card-t">每页一屏</div>
+          <p>统计卡、能力卡、流程图、架构分层、六宫格 —— 按内容自动选组件。</p>
+        </div>
+        <div class="card">
+          <div class="card-k">导航</div>
+          <div class="card-t">按章节走</div>
+          <p>导航条给的是整场结构，不是页码列表；精确页码在右上角。</p>
+        </div>
+      </div>
+      <div class="hbox">
+        这份是<strong>排版示例</strong>，内容取自公开产品手册，不作为官方文档。
+      </div>
+    </section>
+
+    <!-- ============ 3 ============ -->
     <section id="install">
-      <h2><span class="num">02</span>安装</h2>
+      <h2><span class="num">03</span>安装</h2>
       <div class="glow-line"></div>
       <p>
         打开 Claude Code，把下面这行<strong>直接粘给 Claude</strong>，让它替你执行 ——
@@ -379,7 +463,7 @@ footer{
 
     <!-- ============ 3 ============ -->
     <section id="usage">
-      <h2><span class="num">03</span>三种用法</h2>
+      <h2><span class="num">04</span>两种用法</h2>
       <div class="glow-line"></div>
 
       <h3>① 只给主题，让它全写</h3>
@@ -410,23 +494,94 @@ footer{
         <pre><code>按这个大纲做一份 deck，面向合规团队：
 1. 监管背景  2. 规则要求  3. 操作流程  4. 合规联动</code></pre>
       </div>
-
-      <h3>③ 把现有 PDF / PPT 转成 HTML</h3>
-      <p>Claude 会把 PDF 逐页转图读取、或用 <code class="inline">python-pptx</code> 抽取文字，再按品牌规范重排。</p>
-      <div class="code">
-        <button class="copy">复制</button>
-        <pre><code>把这份 PPT 转成 HTML @产品介绍.pdf</code></pre>
-      </div>
       <div class="hbox">
-        转换是<strong>重排不是复刻</strong>：它保留内容与结构，但版式会套用 Cobo 规范。
-        想保留原样请直接用原文件。
+        手上已经有 PDF 或 PPT，也可以直接丢给它（<code class="inline">把这份 PPT 转成 HTML @产品介绍.pdf</code>）——
+        它会读出内容重新排版，是<strong>重排不是复刻</strong>。
       </div>
     </section>
 
-    <!-- ============ 4 ============ -->
-    <section id="flow">
-      <h2><span class="num">04</span>Claude 的四个阶段</h2>
+    <!-- ============ 5 ============ -->
+    <section id="export">
+      <h2><span class="num">05</span>三种交付方式</h2>
       <div class="glow-line"></div>
+      <p>deck 做好之后，看你要怎么发出去 —— 三种方式，按场合挑。</p>
+
+      <h3>① HTML —— 默认就是这个，不用做任何事</h3>
+      <p>
+        生成完你手上就有一个 <code class="inline">.html</code> 文件。双击用浏览器打开就能放映，
+        <strong>不联网也能放</strong>。发微信、发邮件附件、拷 U 盘都行，对方不需要装任何东西。
+        自己上台讲、或者发给同事传阅，用这个就够了。
+      </p>
+
+      <h3>② PDF —— 要发正式附件、要留档时</h3>
+      <p>
+        对方要打印、要存档、或者公司流程只收 PDF，就导一份。用 Playwright 逐页截取，
+        <strong>动画和交互会丢失，版式保持一致</strong>。首次运行会自动装依赖（需要 Node.js）。
+      </p>
+      <div class="code">
+        <button class="copy">复制</button>
+        <pre><code>bash ~/.claude/skills/cobo-slides/scripts/export-pdf.sh my-deck.html</code></pre>
+      </div>
+      <div class="cc">
+        <div class="cc-bar">
+          <span class="cc-dot" style="background:#ff5f57"></span>
+          <span class="cc-dot" style="background:#febc2e"></span>
+          <span class="cc-dot" style="background:#28c840"></span>
+          <span class="cc-name">Claude Code</span>
+        </div>
+        <div class="cc-body">
+<div class="cc-in">bash ~/.claude/skills/cobo-slides/scripts/export-pdf.sh my-deck.html</div>
+<div class="cc-run">Bash(<b>export-pdf.sh my-deck.html</b>)</div>
+<div class="cc-out">Launching headless Chromium…</div>
+<div class="cc-out">Rendering 16 slides…</div>
+<div class="cc-ok">✓ my-deck.pdf  ·  16 页  ·  2.4 MB</div>
+        </div>
+      </div>
+      <div class="cap">↑ 同样是粘一行进 Claude Code，它替你跑完。</div>
+
+      <h3>③ 公网链接 —— 发给客户，效果最好</h3>
+      <p>
+        这是发给客户时最推荐的一种。发一条链接过去，对方<strong>点开就是完整的网页演示</strong>：
+      </p>
+      <ul>
+        <li><strong>不用下载、不用解压</strong> —— 手机、平板、电脑点开就能看</li>
+        <li><strong>动画和交互都在</strong> —— 章节跳转、翻页效果原样保留，比 PDF 好看得多</li>
+        <li><strong>不占附件额度</strong> —— 也不会被邮箱拦掉或压缩</li>
+        <li><strong>随时可更新</strong> —— 改完重新部署，客户手上的链接内容自动跟着变</li>
+      </ul>
+      <p>走 Vercel，首次使用需先 <code class="inline">npx vercel login</code> 登录一次。</p>
+      <div class="code">
+        <button class="copy">复制</button>
+        <pre><code>bash ~/.claude/skills/cobo-slides/scripts/deploy.sh my-deck.html</code></pre>
+      </div>
+      <div class="cc">
+        <div class="cc-bar">
+          <span class="cc-dot" style="background:#ff5f57"></span>
+          <span class="cc-dot" style="background:#febc2e"></span>
+          <span class="cc-dot" style="background:#28c840"></span>
+          <span class="cc-name">Claude Code</span>
+        </div>
+        <div class="cc-body">
+<div class="cc-in">bash ~/.claude/skills/cobo-slides/scripts/deploy.sh my-deck.html</div>
+<div class="cc-run">Bash(<b>deploy.sh my-deck.html</b>)</div>
+<div class="cc-out">Uploading…  Building…</div>
+<div class="cc-ok">✓ https://my-deck-a1b2c3.vercel.app</div>
+<div class="cc-say">链接已生成，直接发给客户就行。<span class="cc-cur"></span></div>
+        </div>
+      </div>
+      <div class="cap">↑ 拿到链接直接丢进对话框发出去。</div>
+
+      <div class="hbox warn">
+        <span class="k">提醒</span> 第三种会把内容<strong>发布到公网</strong>，链接拿到就能看。
+        含客户名称、报价、未公开路线图的 deck，发之前先确认可以外发。
+      </div>
+    </section>
+
+    <!-- ============ 6 ============ -->
+    <section id="flow">
+      <h2><span class="num">06</span>Claude 的四个阶段</h2>
+      <div class="glow-line"></div>
+      <p>知道它怎么工作，配合起来更顺 —— 这部分属于补充信息，不看也不影响使用。</p>
       <ol>
         <li><strong>问需求</strong> —— 主题、受众、内容来源、页数、章节，一次性问完。</li>
         <li><strong>出大纲</strong> —— 给出分章与页数分配，<strong>等你确认</strong>再往下走。这一步值得认真看：大纲的顶层章节会原样变成导航条的 Tab。</li>
@@ -434,107 +589,15 @@ footer{
         <li><strong>交付</strong> —— 打开预览，并问你要不要导出 PDF 或部署成公网链接。</li>
       </ol>
       <div class="hbox">
-        阶段 2 的大纲限制在 <strong>4–6 个章节</strong>。不是排版洁癖 —— 章节数直接决定导航条可不可用，见下一节。
-      </div>
-    </section>
-
-    <!-- ============ 5 ============ -->
-    <section id="output">
-      <h2><span class="num">05</span>生成效果</h2>
-      <div class="glow-line"></div>
-      <div class="tw">
-        <table>
-          <thead><tr><th>项</th><th>规格</th></tr></thead>
-          <tbody>
-            <tr><td><strong>背景</strong></td><td><code class="inline">#0d0d0d</code> 近黑，卡片 <code class="inline">#161616</code>，与 cobo.com 一致</td></tr>
-            <tr><td><strong>强调色</strong></td><td><code class="inline">#7C7FE8</code> 紫，与官网 "trusted" 同色；CTA 蓝 <code class="inline">#3D50F5</code></td></tr>
-            <tr><td><strong>字体</strong></td><td>Plus Jakarta Sans（正文）+ Varela Round（标志）</td></tr>
-            <tr><td><strong>版心</strong></td><td>每页 <code class="inline">100dvh</code>，scroll-snap 逐页对齐，绝不滚动</td></tr>
-            <tr><td><strong>图标</strong></td><td>一律内联 SVG 线性图标，<span class="bad">禁止 emoji</span></td></tr>
-            <tr><td><strong>动画</strong></td><td>入场淡入 + 8 级错峰延迟，尊重 <code class="inline">prefers-reduced-motion</code></td></tr>
-            <tr><td><strong>响应式</strong></td><td>桌面 / 平板 / 手机，含超短视口降级</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <h3>内置组件</h3>
-      <p>统计卡、Tier 卡、能力卡、流程图、架构分层、模块宫格、案例布局、高亮框、合作方 chips —— Claude 会按内容类型自动选用，你也可以直接点名要哪个。</p>
-    </section>
-
-    <!-- ============ 6 ============ -->
-    <section id="nav">
-      <h2><span class="num">06</span>导航条规则</h2>
-      <div class="glow-line"></div>
-      <p>顶部导航条给的是<strong>整场演讲的结构</strong>，不是页码索引。它永远只有 4–6 个章节 Tab，硬上限 7 个 —— 哪怕你的 deck 有 23 页。</p>
-
-      <div class="demo" aria-hidden="true">
-        <div class="demo-r1">
-          <svg width="44" height="13" viewBox="0 0 92 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0"><path d="M63.054 17.2847C63.054 14.0335 60.4155 11.3966 57.1644 11.3981C53.9132 11.3981 51.2763 14.0365 51.2778 17.2877C51.2778 20.5389 53.9147 23.1743 57.1659 23.1743C60.4171 23.1743 63.054 20.5374 63.054 17.2862V17.2847ZM91.3344 17.2847C91.3299 23.1971 86.5316 27.9863 80.6191 27.9817C76.2218 27.9786 72.2725 25.2853 70.6644 21.1928L74.7402 17.117V17.2862C74.7478 20.5328 77.3863 23.1575 80.6329 23.1484C83.8795 23.1392 86.5042 20.5023 86.495 17.2557C86.4874 14.0091 83.849 11.3844 80.6024 11.3935C79.0492 11.3981 77.56 12.0154 76.4626 13.1144L64.7779 24.8052C60.635 29.0136 53.8644 29.0669 49.6545 24.9241C47.6075 22.9091 46.4582 20.1563 46.4628 17.2847V2.26495C46.5451 0.934302 47.6898 -0.0762592 49.0189 0.00452475C50.2352 0.0792118 51.2031 1.04862 51.2793 2.26495V8.27192C56.2178 5.02075 62.8573 6.38951 66.1085 11.328C66.8539 12.4605 67.3767 13.7241 67.651 15.0517L73.059 9.64525C77.2384 5.4643 84.0166 5.46278 88.1976 9.6422C90.2233 11.6679 91.3543 14.4207 91.3344 17.2847ZM44.8593 17.2847C44.87 23.191 40.0915 27.9893 34.1836 28C29.7695 28.0091 25.8034 25.3036 24.1999 21.1928L28.2757 17.117V17.2862C28.2833 20.5328 30.9218 23.1575 34.1684 23.1484C37.415 23.1407 40.0397 20.5023 40.0305 17.2557C40.0229 14.0091 37.3845 11.3844 34.1379 11.3935C32.5847 11.3981 31.0955 12.0154 29.9981 13.1144L18.2722 24.8509C14.0913 29.0303 7.31304 29.0288 3.13362 24.8479C-1.04581 20.6669 -1.04428 13.8887 3.13667 9.70927C7.31609 5.53137 14.0928 5.53137 18.2722 9.70927C19.2127 10.6543 19.2081 12.1846 18.2616 13.1235C17.3165 14.064 15.7862 14.0594 14.8473 13.1129C12.5442 10.8174 8.81593 10.8235 6.52045 13.1266C4.22496 15.4297 4.23106 19.1579 6.53416 21.4534C8.8327 23.7443 12.5503 23.7443 14.8473 21.4534L26.593 9.67726C30.7648 5.49631 37.5369 5.48869 41.7194 9.66049C43.7436 11.6801 44.8745 14.4267 44.8593 17.2877V17.2831V17.2847Z" fill="white"/></svg>
-          <div class="tb-div"></div>
-          <div class="demo-title">Travel Rule · 合规转账要求</div>
-          <div class="demo-count">05 / 16</div>
-        </div>
-        <div class="demo-r2">
-          <div class="demo-ch"><div class="demo-n">·</div><div class="demo-nm">封面</div></div>
-          <div class="demo-ch"><div class="demo-n">01</div><div class="demo-nm">监管背景</div></div>
-          <div class="demo-ch on"><div class="demo-n">02</div><div class="demo-nm">规则要求</div></div>
-          <div class="demo-ch"><div class="demo-n">03</div><div class="demo-nm">操作流程</div></div>
-          <div class="demo-ch"><div class="demo-n">04</div><div class="demo-nm">合规联动</div></div>
-          <div class="demo-ch"><div class="demo-n">·</div><div class="demo-nm">结语</div></div>
-        </div>
-        <div class="demo-bar"></div>
-      </div>
-      <div class="demo-cap">↑ 一份 16 页的 deck，导航条只有 6 个 Tab。精确页码在右上角。</div>
-
-      <div class="g2">
-        <div class="card">
-          <div class="card-k good">正确</div>
-          <div class="card-t">名字概括内容</div>
-          <ul>
-            <li><code class="inline">监管背景</code> <code class="inline">规则要求</code></li>
-            <li><code class="inline">操作流程</code> <code class="inline">合规联动</code></li>
-          </ul>
-        </div>
-        <div class="card">
-          <div class="card-k bad">错误</div>
-          <div class="card-t">空壳或纯数字</div>
-          <ul>
-            <li><code class="inline">第一部分</code> <code class="inline">Part 1</code></li>
-            <li><code class="inline">其他</code> <code class="inline">01</code></li>
-          </ul>
-        </div>
-      </div>
-      <p>
-        每个 Tab 用 <code class="inline">data-start</code> / <code class="inline">data-end</code> 覆盖一段页码区间，
-        区间必须<strong>无缝隙、无重叠</strong>地铺满所有页。名字是内容，编号只负责排序 ——
-        窄屏空间不够时藏的是编号，永远不是名字。
-      </p>
-      <div class="hbox">
-        <strong>5 个字讲不清的章节，说明这章切得太粗</strong> —— 该拆或重切，而不是起个含糊的名字。
+        阶段 2 的大纲限制在 <strong>4–6 个章节</strong>，因为这些章节会直接变成顶部导航条的 Tab ——
+        章节太多，导航条就退化成页码列表了。
       </div>
     </section>
 
 
-    <!-- ============ 8 ============ -->
-    <section id="export">
-      <h2><span class="num">07</span>导出与部署</h2>
-      <div class="glow-line"></div>
-      <h3>导出 PDF</h3>
-      <p>用 Playwright 逐页截取，首次运行会自动装依赖（需要 Node.js）。</p>
-      <div class="code">
-        <button class="copy">复制</button>
-        <pre><code>bash ~/.claude/skills/cobo-slides/scripts/export-pdf.sh my-deck.html <span class="cm"># 可选：追加输出路径</span></code></pre>
-      </div>
-      <h3>部署成公网链接</h3>
-      <p>走 Vercel，需先 <code class="inline">npx vercel login</code>。</p>
-      <div class="code">
-        <button class="copy">复制</button>
-        <pre><code>bash ~/.claude/skills/cobo-slides/scripts/deploy.sh my-deck.html</code></pre>
-      </div>
-      <div class="hbox warn">
-        <span class="k">提醒</span> 部署会把内容发布到公网。含客户名称、报价、未公开路线图的 deck，
-        请先确认可以外发。
-      </div>
-    </section>
+
+
+
 
 
 

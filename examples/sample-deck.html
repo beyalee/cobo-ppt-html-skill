@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cobo 产品概览 · 示例 Deck</title>
+<meta name="description" content="Cobo Slides 技能的输出示例，用于展示版式与导航，非官方产品文档。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+/* ---- viewport-base.css ---- */
+html { height:100%; overflow-x:hidden; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+body { min-height:100%; }
+.slide { width:100%; height:100vh; height:100dvh; overflow:hidden; scroll-snap-align:start; display:flex; flex-direction:column; position:relative; }
+.slide-content { flex:1; display:flex; flex-direction:column; justify-content:center; max-height:100%; overflow:hidden; padding:var(--pad); gap:var(--gap); }
+
+/* ---- Cobo brand ---- */
+:root{
+  --bg:#0d0d0d; --bg-card:#161616; --bg-card2:#1c1c1c;
+  --purple:#7C7FE8; --purple-dim:rgba(124,127,232,.14); --purple-border:rgba(124,127,232,.28);
+  --text:#fff; --text-sec:#888; --text-muted:#3a3a3a;
+  --border:rgba(255,255,255,.07); --border-med:rgba(255,255,255,.11);
+  --nav-h:78px;
+  --h2-size:clamp(1.15rem,2.8vw,2.1rem); --h3-size:clamp(.9rem,1.7vw,1.28rem);
+  --body-size:clamp(.7rem,1.1vw,.92rem); --small-size:clamp(.6rem,.88vw,.76rem);
+  --label-size:clamp(.53rem,.72vw,.66rem);
+  --pad:clamp(1.4rem,3.5vw,4rem); --gap:clamp(.55rem,1.3vw,1.5rem); --gap-sm:clamp(.28rem,.65vw,.75rem);
+  --ease:cubic-bezier(.16,1,.3,1); --dur:.6s;
+  --font:'Plus Jakarta Sans',sans-serif;
+}
+body{font-family:var(--font); background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased}
+.slide{background:var(--bg); padding-top:var(--nav-h)}
+h1{font-weight:800; letter-spacing:-.03em; line-height:1.07}
+h2{font-size:var(--h2-size); font-weight:700; letter-spacing:-.02em; line-height:1.15}
+p,li{font-size:var(--body-size); color:var(--text-sec); line-height:1.65}
+ul{list-style:none}
+ul li{padding-left:1.1em; position:relative}
+ul li::before{content:'·'; position:absolute; left:0; color:var(--purple); font-weight:700}
+
+/* ---- top nav ---- */
+.top-nav{position:fixed; top:0; left:0; right:0; z-index:2000; height:var(--nav-h);
+  background:rgba(13,13,13,.92); backdrop-filter:blur(16px) saturate(120%); -webkit-backdrop-filter:blur(16px) saturate(120%);
+  display:flex; flex-direction:column}
+.tn-row1{display:flex; align-items:center; padding:0 var(--pad); gap:clamp(.8rem,2vw,2rem); height:36px; flex-shrink:0; border-bottom:1px solid var(--border)}
+.tn-logo{display:flex; align-items:center; flex-shrink:0; cursor:pointer}
+.tn-divider{width:1px; height:16px; background:var(--border-med); flex-shrink:0}
+.tn-deck-title{flex:1; font-size:clamp(.6rem,.9vw,.76rem); font-weight:500; color:var(--text-sec); letter-spacing:.03em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.tn-counter{flex-shrink:0; font-size:clamp(.55rem,.78vw,.66rem); font-weight:600; color:var(--text-sec); letter-spacing:.1em; background:rgba(255,255,255,.04); border:1px solid var(--border); padding:2px 9px; border-radius:20px}
+.tn-row2{display:flex; align-items:stretch; height:42px; flex:1}
+.tn-ch{flex:1; background:none; border:none; border-right:1px solid var(--border); cursor:pointer; font-family:var(--font);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:0 clamp(4px,.8vw,10px); white-space:nowrap; transition:background .2s}
+.tn-ch:last-child{border-right:none}
+.tn-ch-num{font-size:clamp(.5rem,.65vw,.58rem); font-weight:700; color:var(--text-muted); letter-spacing:.12em; transition:color .2s}
+.tn-ch-name{font-size:clamp(.58rem,.85vw,.72rem); font-weight:500; color:var(--text-sec); transition:color .2s}
+.tn-ch:hover{background:rgba(255,255,255,.03)}
+.tn-ch.active{background:rgba(124,127,232,.08)}
+.tn-ch.active .tn-ch-num{color:var(--purple)}
+.tn-ch.active .tn-ch-name{color:var(--text); font-weight:600}
+.progress-bar{position:fixed; top:var(--nav-h); left:0; height:2px; background:linear-gradient(90deg,var(--purple),#a5a8ff); width:0%; z-index:1999; transition:width .35s ease}
+.nav-dots{position:fixed; right:clamp(.5rem,1.2vw,1rem); top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:5px; z-index:1999}
+.nav-dot{width:4px; height:4px; border-radius:50%; background:var(--text-muted); cursor:pointer; transition:all .25s; border:none; padding:0}
+.nav-dot.active{background:var(--purple); box-shadow:0 0 5px var(--purple); transform:scale(1.6)}
+
+/* ---- components ---- */
+.chip{display:inline-flex; align-self:flex-start; font-size:var(--label-size); font-weight:600; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--purple); border:1px solid var(--purple-border); background:var(--purple-dim); padding:2px 10px; border-radius:20px}
+.chip.warn{color:#ffb450; border-color:rgba(255,180,80,.32); background:rgba(255,180,80,.08)}
+.glow-line{width:clamp(32px,5vw,54px); height:2px; background:linear-gradient(90deg,var(--purple),#a5a8ff); border-radius:2px}
+.hl{color:var(--purple)}
+.hl2{background:linear-gradient(135deg,var(--purple),#a5a8ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text}
+.g2{display:grid; grid-template-columns:repeat(2,1fr); gap:var(--gap)}
+.g4{display:grid; grid-template-columns:repeat(4,1fr); gap:var(--gap-sm)}
+.g2x4{display:grid; grid-template-columns:repeat(4,1fr); gap:var(--gap-sm)}
+.stat{background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:clamp(.55rem,1.1vw,.95rem); text-align:center}
+.stat-num{font-size:clamp(1.1rem,2.2vw,1.85rem); font-weight:800; line-height:1.2; letter-spacing:-.02em}
+.stat-lbl{font-size:var(--label-size); color:var(--text-sec); margin-top:3px}
+.card,.cap{background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:clamp(.65rem,1.3vw,1.05rem); transition:border-color .22s,background .22s}
+.card:hover,.cap:hover{border-color:var(--purple-border); background:var(--bg-card2)}
+.card-title,.cap-t{font-size:var(--h3-size); font-weight:700; margin-bottom:5px}
+.cap-icon{display:block; line-height:0; margin-bottom:8px}
+.cap-sub{font-size:var(--label-size); color:var(--purple); font-weight:600; letter-spacing:.05em; margin-bottom:6px}
+.cap li{font-size:clamp(.56rem,.8vw,.7rem); line-height:1.55}
+.mods{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(.35rem,.75vw,.65rem)}
+.mod{background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:clamp(.5rem,1vw,.85rem); transition:border-color .22s,background .22s}
+.mod:hover{border-color:var(--purple-border); background:var(--bg-card2)}
+.mod-n{font-size:var(--label-size); font-weight:700; color:var(--purple); margin-bottom:3px; letter-spacing:.05em}
+.mod-t{font-size:clamp(.62rem,.95vw,.8rem); font-weight:700; margin-bottom:3px}
+.mod-d{font-size:clamp(.56rem,.78vw,.68rem); color:var(--text-sec); line-height:1.5}
+.flow{display:flex; align-items:center; gap:clamp(.25rem,.7vw,.55rem)}
+.flow-box{flex:1; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:clamp(.45rem,.9vw,.75rem); text-align:center}
+.flow-box.hi{border-color:var(--purple-border); background:rgba(124,127,232,.07)}
+.flow-title{font-size:var(--label-size); font-weight:600; color:var(--purple); margin-bottom:2px}
+.flow-desc{font-size:clamp(.53rem,.75vw,.66rem); color:var(--text-sec); line-height:1.45}
+.flow-arrow{color:var(--text-muted); font-size:clamp(.75rem,1.1vw,.95rem); flex-shrink:0}
+.layers{display:flex; flex-direction:column; gap:var(--gap-sm)}
+.layer{background:var(--bg-card); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; gap:var(--gap); padding:clamp(.45rem,.9vw,.7rem) clamp(.7rem,1.3vw,1.1rem)}
+.layer.hi{border-color:var(--purple-border)}
+.layer-lbl{font-size:var(--small-size); font-weight:600; color:var(--purple); white-space:nowrap; min-width:clamp(65px,10vw,100px)}
+.layer-tags{display:flex; flex-wrap:wrap; gap:5px}
+.ltag{background:rgba(124,127,232,.1); border:1px solid var(--purple-border); border-radius:4px; padding:2px 7px; font-size:clamp(.53rem,.75vw,.65rem); color:var(--text-sec)}
+.hbox{background:rgba(124,127,232,.07); border:1px solid var(--purple-border); border-radius:8px; padding:clamp(.55rem,1.1vw,.9rem); font-size:var(--body-size); color:var(--text-sec)}
+.hbox strong{color:var(--text); font-weight:600}
+
+/* ---- cover / closing ---- */
+.cover-body{flex:1; display:flex; flex-direction:column; justify-content:center; padding:var(--pad); max-width:65%; gap:var(--gap)}
+.cover-title{font-size:clamp(1.8rem,5.2vw,4.2rem); font-weight:800; line-height:1.06; letter-spacing:-.03em}
+.cover-meta{font-size:var(--body-size); color:var(--text-sec); line-height:1.9}
+.cover-meta strong{color:var(--text); font-weight:600}
+.cover-orb{position:absolute; right:6%; top:50%; transform:translateY(-50%); width:clamp(140px,26vw,340px); height:clamp(140px,26vw,340px); border-radius:50%;
+  background:radial-gradient(circle,rgba(124,127,232,.2) 0%,rgba(124,127,232,.05) 55%,transparent 70%); border:1px solid rgba(124,127,232,.16); animation:orb 5s ease-in-out infinite}
+@keyframes orb{0%,100%{transform:translateY(-50%) scale(1);opacity:.7}50%{transform:translateY(-50%) scale(1.06);opacity:1}}
+.slide-thanks{justify-content:center; align-items:center}
+.thanks-inner{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:var(--gap); padding:var(--pad)}
+.quote-txt{font-size:clamp(1.7rem,5vw,4.4rem); font-weight:800; letter-spacing:-.04em; line-height:1.08}
+
+/* ---- animations ---- */
+.reveal{opacity:0; transform:translateY(20px); transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease)}
+.slide.visible .reveal{opacity:1; transform:none}
+.slide.visible .d1{transition-delay:.04s}.slide.visible .d2{transition-delay:.11s}
+.slide.visible .d3{transition-delay:.18s}.slide.visible .d4{transition-delay:.25s}
+.slide.visible .d5{transition-delay:.32s}.slide.visible .d6{transition-delay:.39s}
+.slide.visible .d7{transition-delay:.46s}
+
+/* ---- responsive ---- */
+@media (max-height:700px){:root{--pad:clamp(.7rem,2.8vw,1.8rem);--gap:clamp(.3rem,.9vw,.85rem);--h2-size:clamp(1rem,2.5vw,1.55rem)}}
+@media (max-height:600px){:root{--pad:clamp(.5rem,1.8vw,1.1rem);--gap:clamp(.2rem,.65vw,.55rem);--body-size:clamp(.6rem,.92vw,.78rem)} .nav-dots{display:none}}
+@media (max-width:760px){
+  .g4,.g2x4{grid-template-columns:repeat(2,1fr)} .mods{grid-template-columns:repeat(2,1fr)} .g2{grid-template-columns:1fr}
+  .cover-body{max-width:100%} .cover-orb{display:none}
+  .flow{flex-direction:column; align-items:stretch} .flow-arrow{transform:rotate(90deg); text-align:center}
+  /* keep the NAME, drop the number */
+  .tn-ch-num{display:none} .tn-ch{padding:0 3px}
+  .tn-ch-name{display:block; width:100%; text-align:center; font-size:clamp(.5rem,2.5vw,.68rem); overflow:hidden; text-overflow:ellipsis}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.2s!important} html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav class="top-nav" id="topNav">
+  <div class="tn-row1">
+    <div class="tn-logo" onclick="goToSlide(0)" title="回到封面">
+      <svg width="69" height="21" viewBox="0 0 92 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block"><path d="M63.054 17.2847C63.054 14.0335 60.4155 11.3966 57.1644 11.3981C53.9132 11.3981 51.2763 14.0365 51.2778 17.2877C51.2778 20.5389 53.9147 23.1743 57.1659 23.1743C60.4171 23.1743 63.054 20.5374 63.054 17.2862V17.2847ZM91.3344 17.2847C91.3299 23.1971 86.5316 27.9863 80.6191 27.9817C76.2218 27.9786 72.2725 25.2853 70.6644 21.1928L74.7402 17.117V17.2862C74.7478 20.5328 77.3863 23.1575 80.6329 23.1484C83.8795 23.1392 86.5042 20.5023 86.495 17.2557C86.4874 14.0091 83.849 11.3844 80.6024 11.3935C79.0492 11.3981 77.56 12.0154 76.4626 13.1144L64.7779 24.8052C60.635 29.0136 53.8644 29.0669 49.6545 24.9241C47.6075 22.9091 46.4582 20.1563 46.4628 17.2847V2.26495C46.5451 0.934302 47.6898 -0.0762592 49.0189 0.00452475C50.2352 0.0792118 51.2031 1.04862 51.2793 2.26495V8.27192C56.2178 5.02075 62.8573 6.38951 66.1085 11.328C66.8539 12.4605 67.3767 13.7241 67.651 15.0517L73.059 9.64525C77.2384 5.4643 84.0166 5.46278 88.1976 9.6422C90.2233 11.6679 91.3543 14.4207 91.3344 17.2847ZM44.8593 17.2847C44.87 23.191 40.0915 27.9893 34.1836 28C29.7695 28.0091 25.8034 25.3036 24.1999 21.1928L28.2757 17.117V17.2862C28.2833 20.5328 30.9218 23.1575 34.1684 23.1484C37.415 23.1407 40.0397 20.5023 40.0305 17.2557C40.0229 14.0091 37.3845 11.3844 34.1379 11.3935C32.5847 11.3981 31.0955 12.0154 29.9981 13.1144L18.2722 24.8509C14.0913 29.0303 7.31304 29.0288 3.13362 24.8479C-1.04581 20.6669 -1.04428 13.8887 3.13667 9.70927C7.31609 5.53137 14.0928 5.53137 18.2722 9.70927C19.2127 10.6543 19.2081 12.1846 18.2616 13.1235C17.3165 14.064 15.7862 14.0594 14.8473 13.1129C12.5442 10.8174 8.81593 10.8235 6.52045 13.1266C4.22496 15.4297 4.23106 19.1579 6.53416 21.4534C8.8327 23.7443 12.5503 23.7443 14.8473 21.4534L26.593 9.67726C30.7648 5.49631 37.5369 5.48869 41.7194 9.66049C43.7436 11.6801 44.8745 14.4267 44.8593 17.2877V17.2831V17.2847Z" fill="white"/></svg>
+    </div>
+    <div class="tn-divider"></div>
+    <div class="tn-deck-title">Cobo 产品概览 · 示例 Deck</div>
+    <div class="tn-counter" id="slideCounter">01 / 10</div>
+  </div>
+  <!-- 10 slides -> 6 chapter tabs, ranges tile 0..9 -->
+  <div class="tn-row2">
+    <button class="tn-ch" data-start="0" data-end="0"><span class="tn-ch-num">·</span><span class="tn-ch-name">封面</span></button>
+    <button class="tn-ch" data-start="1" data-end="2"><span class="tn-ch-num">01</span><span class="tn-ch-name">平台概览</span></button>
+    <button class="tn-ch" data-start="3" data-end="5"><span class="tn-ch-num">02</span><span class="tn-ch-name">钱包类型</span></button>
+    <button class="tn-ch" data-start="6" data-end="7"><span class="tn-ch-num">03</span><span class="tn-ch-name">风控治理</span></button>
+    <button class="tn-ch" data-start="8" data-end="8"><span class="tn-ch-num">04</span><span class="tn-ch-name">生态集成</span></button>
+    <button class="tn-ch" data-start="9" data-end="9"><span class="tn-ch-num">·</span><span class="tn-ch-name">结语</span></button>
+  </div>
+</nav>
+<div class="progress-bar" id="progressBar"></div>
+<nav class="nav-dots" id="navDots" aria-label="幻灯片导航"></nav>
+
+<!-- 00 封面 -->
+<section class="slide" id="slide-0">
+  <div class="cover-body">
+    <div class="chip warn reveal d1">示例 SAMPLE · 非官方文档</div>
+    <h1 class="cover-title reveal d2">Cobo<br><span class="hl">产品概览</span></h1>
+    <div class="cover-meta reveal d3">
+      <strong>Cobo Slides 输出示例</strong><br>
+      用于展示版式、组件与章节导航<br>
+      内容取自公开产品手册，仅作排版演示
+    </div>
+  </div>
+  <div class="cover-orb"></div>
+</section>
+
+<!-- 01 平台概览 -->
+<section class="slide" id="slide-1">
+  <div class="slide-content">
+    <div class="chip reveal d1">Overview</div>
+    <h2 class="reveal d2">一个平台，<span class="hl">四类钱包</span></h2>
+    <div class="glow-line reveal d2"></div>
+    <div class="g2x4">
+      <div class="stat reveal d3"><div class="stat-num hl2">4</div><div class="stat-lbl">钱包类型</div></div>
+      <div class="stat reveal d3"><div class="stat-num hl2">70+</div><div class="stat-lbl">支持公链</div></div>
+      <div class="stat reveal d4"><div class="stat-num hl2">2,000+</div><div class="stat-lbl">支持币种</div></div>
+      <div class="stat reveal d4"><div class="stat-num hl2">8</div><div class="stat-lbl">接入交易所</div></div>
+    </div>
+    <div class="hbox reveal d5">
+      这一页用的是<strong>统计卡（stat）</strong>组件 —— 适合放公司事实与关键数字，最多 2×4 共八张。
+    </div>
+  </div>
+</section>
+
+<!-- 02 平台概览 -->
+<section class="slide" id="slide-2">
+  <div class="slide-content">
+    <div class="chip reveal d1">Capabilities</div>
+    <h2 class="reveal d2">核心能力<span class="hl">四块</span></h2>
+    <div class="glow-line reveal d2"></div>
+    <div class="g4">
+      <div class="cap reveal d3">
+        <div class="cap-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C7FE8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5l10 5 10-5-10-5z"/><path d="M2 14l10 5 10-5"/><path d="M2 18.5l10 5 10-5"/></svg></div>
+        <div class="cap-t">资产托管</div>
+        <ul><li>多种托管模式</li><li>分层密钥架构</li></ul>
+      </div>
+      <div class="cap reveal d4">
+        <div class="cap-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C7FE8" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/><line x1="5.8" y1="6.9" x2="9.5" y2="10.1"/><line x1="18.2" y1="6.9" x2="14.5" y2="10.1"/><line x1="5.8" y1="17.1" x2="9.5" y2="13.9"/><line x1="18.2" y1="17.1" x2="14.5" y2="13.9"/></svg></div>
+        <div class="cap-t">转账清算</div>
+        <ul><li>多链转账</li><li>地址簿与分类</li></ul>
+      </div>
+      <div class="cap reveal d5">
+        <div class="cap-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5.5 3.5 9.74 8 11 4.5-1.26 8-5.5 8-11V6z"/><polyline points="9,12 11,14 15,10"/></svg></div>
+        <div class="cap-t">风控治理</div>
+        <ul><li>交易策略</li><li>角色与审批</li></ul>
+      </div>
+      <div class="cap reveal d6">
+        <div class="cap-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C7FE8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8,7 3,12 8,17"/><polyline points="16,7 21,12 16,17"/><line x1="13.5" y1="5" x2="10.5" y2="19"/></svg></div>
+        <div class="cap-t">开发接入</div>
+        <ul><li>WaaS API</li><li>Webhook 回调</li></ul>
+      </div>
+    </div>
+    <div class="hbox reveal d7">
+      这一页用的是<strong>能力卡（cap）</strong>—— 四列布局，每张一个线性 SVG 图标加两三条要点。
+    </div>
+  </div>
+</section>
+
+<!-- 03 钱包类型 -->
+<section class="slide" id="slide-3">
+  <div class="slide-content">
+    <div class="chip reveal d1">Wallet Types</div>
+    <h2 class="reveal d2">托管与 <span class="hl">MPC</span></h2>
+    <div class="glow-line reveal d2"></div>
+    <div class="g2">
+      <div class="card reveal d3">
+        <div class="card-title">托管钱包</div>
+        <div class="cap-sub">70+ 链 · 2,000+ 币</div>
+        <ul>
+          <li>冷热温分层架构</li>
+          <li>资产钱包 / Web3 钱包两类</li>
+          <li>需完成 KYC</li>
+        </ul>
+      </div>
+      <div class="card reveal d4">
+        <div class="card-title">MPC 钱包</div>
+        <div class="cap-sub">30+ 链 · 2,000+ 币</div>
+        <ul>
+          <li>密钥分片，无单点失效</li>
+          <li>机构控制型 / 用户控制型</li>
+          <li>入门方案无需 KYC</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox reveal d5">
+      两列对比用 <strong>g2 + card</strong>。内容多的时候拆成两页，而不是把四类挤在一屏。
+    </div>
+  </div>
+</section>
+
+<!-- 04 钱包类型 -->
+<section class="slide" id="slide-4">
+  <div class="slide-content">
+    <div class="chip reveal d1">Wallet Types</div>
+    <h2 class="reveal d2">智能合约与<span class="hl">交易所钱包</span></h2>
+    <div class="glow-line reveal d2"></div>
+    <div class="g2">
+      <div class="card reveal d3">
+        <div class="card-title">智能合约钱包</div>
+        <div class="cap-sub">Safe&#123;Wallet&#125; · 9 条链</div>
+        <ul>
+          <li>创建、导入与日常管理</li>
+          <li>Delegate 密钥配置</li>
+          <li>基于角色的链上权限</li>
+        </ul>
+      </div>
+      <div class="card reveal d4">
+        <div class="card-title">交易所钱包</div>
+        <div class="cap-sub">8 家交易所</div>
+        <ul>
+          <li>多交易所账户统一管理</li>
+          <li>逐家的 API Key 配置指引</li>
+          <li>Binance、OKX、Bybit 等</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 钱包类型 -->
+<section class="slide" id="slide-5">
+  <div class="slide-content">
+    <div class="chip reveal d1">Architecture</div>
+    <h2 class="reveal d2">分层看，<span class="hl">是这样组织的</span></h2>
+    <div class="glow-line reveal d2"></div>
+    <div class="layers">
+      <div class="layer reveal d3">
+        <div class="layer-lbl">接入层</div>
+        <div class="layer-tags"><span class="ltag">Portal 网页</span><span class="ltag">移动端</span><span class="ltag">WaaS API</span></div>
+      </div>
+      <div class="layer reveal d4">
+        <div class="layer-lbl">策略层</div>
+        <div class="layer-tags"><span class="ltag">交易策略</span><span class="ltag">角色权限</span><span class="ltag">治理审批</span></div>
+      </div>
+      <div class="layer reveal d5">
+        <div class="layer-lbl">钱包层</div>
+        <div class="layer-tags"><span class="ltag">托管</span><span class="ltag">MPC</span><span class="ltag">智能合约</span><span class="ltag">交易所</span></div>
+      </div>
+      <div class="layer hi reveal d6">
+        <div class="layer-lbl">密钥层</div>
+        <div class="layer-tags"><span class="ltag">分层冷热温</span><span class="ltag">MPC 分片</span><span class="ltag">Cobo Guard 签名</span></div>
+      </div>
+    </div>
+    <div class="hbox reveal d7">
+      架构图用 <strong>layers</strong> 组件，最多四行 —— 再多就该拆页或换成别的表达。
+    </div>
+  </div>
+</section>
+
+<!-- 06 风控治理 -->
+<section class="slide" id="slide-6">
+  <div class="slide-content">
+    <div class="chip reveal d1">Risk Controls</div>
+    <h2 class="reveal d2">一笔转账，<span class="hl">要过几道关</span></h2>
+    <div class="glow-line reveal d2"></div>
+    <div class="flow reveal d3">
+      <div class="flow-box"><div class="flow-title">发起</div><div class="flow-desc">填写转账信息</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><div class="flow-title">策略判定</div><div class="flow-desc">命中链上链下规则</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><div class="flow-title">审批</div><div class="flow-desc">按角色多人会签</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><div class="flow-title">安全确认</div><div class="flow-desc">Guard 签名放行</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box hi"><div class="flow-title">上链</div><div class="flow-desc">广播并回调</div></div>
+    </div>
+    <div class="hbox reveal d4">
+      流程图用 <strong>flow</strong> 组件，四到五个方框为宜。窄屏会自动转成竖排。
+    </div>
+  </div>
+</section>
+
+<!-- 07 风控治理 -->
+<section class="slide" id="slide-7">
+  <div class="slide-content">
+    <div class="chip reveal d1">Governance</div>
+    <h2 class="reveal d2">策略与权限<span class="hl">怎么配</span></h2>
+    <div class="glow-line reveal d2"></div>
+    <div class="layers">
+      <div class="layer reveal d3">
+        <div class="layer-lbl">交易策略</div>
+        <div class="layer-tags"><span class="ltag">代币转账</span><span class="ltag">合约调用</span><span class="ltag">消息签名</span><span class="ltag">紧急策略</span></div>
+      </div>
+      <div class="layer reveal d4">
+        <div class="layer-lbl">组织治理</div>
+        <div class="layer-tags"><span class="ltag">成员管理</span><span class="ltag">角色权限</span><span class="ltag">审批通知</span><span class="ltag">账户冻结</span></div>
+      </div>
+      <div class="layer hi reveal d5">
+        <div class="layer-lbl">效率工具</div>
+        <div class="layer-tags"><span class="ltag">自动归集</span><span class="ltag">地址簿</span><span class="ltag">交易分类</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 生态集成 -->
+<section class="slide" id="slide-8">
+  <div class="slide-content">
+    <div class="chip reveal d1">Apps</div>
+    <h2 class="reveal d2">应用生态，<span class="hl">按需安装</span></h2>
+    <div class="glow-line reveal d2"></div>
+    <div class="mods">
+      <div class="mod reveal d3"><div class="mod-n">Earn</div><div class="mod-t">链上收益</div><div class="mod-d">DeFi 收益产品的申购与赎回</div></div>
+      <div class="mod reveal d3"><div class="mod-n">Screening</div><div class="mod-t">合规筛查</div><div class="mod-d">地址与交易的风险监测</div></div>
+      <div class="mod reveal d4"><div class="mod-n">Tokenization</div><div class="mod-t">代币发行</div><div class="mod-d">稳定币与 RWA 的发行管理</div></div>
+      <div class="mod reveal d4"><div class="mod-n">Token Swap</div><div class="mod-t">兑换跨链</div><div class="mod-d">站内兑换与跨链桥接</div></div>
+      <div class="mod reveal d5"><div class="mod-n">Staking</div><div class="mod-t">质押</div><div class="mod-d">质押与解押流程</div></div>
+      <div class="mod reveal d5"><div class="mod-n">Reports</div><div class="mod-t">对账报表</div><div class="mod-d">报表生成与导出</div></div>
+    </div>
+    <div class="hbox reveal d6">
+      六宫格用 <strong>mods</strong> 组件，3×2 正好一屏，第七项开始就该考虑拆页。
+    </div>
+  </div>
+</section>
+
+<!-- 09 结语 -->
+<section class="slide slide-thanks" id="slide-9">
+  <div class="thanks-inner">
+    <div class="chip reveal d1">Sample</div>
+    <div class="quote-txt reveal d2">这就是<span class="hl2">一份输出</span></div>
+    <p class="reveal d3" style="max-width:min(90vw,560px)">
+      单个 HTML 文件 · 零依赖 · 离线可用<br>
+      本 deck 为排版示例，内容取自公开产品手册，不作为官方文档
+    </p>
+  </div>
+  <div class="cover-orb" style="right:auto;left:50%;transform:translate(-50%,-50%);opacity:.5"></div>
+</section>
+
+<script>
+class SlidePresentation {
+  constructor() {
+    this.slides = Array.from(document.querySelectorAll('.slide'));
+    this.currentSlide = 0; this.isScrolling = false;
+    this.navLock = false; this._navTimer = null; this._settleTimer = null;
+    this.navDotsContainer = document.getElementById('navDots');
+    this.progressBar = document.getElementById('progressBar');
+    this.counter = document.getElementById('slideCounter');
+    this.setupNavDots(); this.setupChapterTabs(); this.setupIntersectionObserver();
+    this.setupKeyboardNav(); this.setupWheelNav(); this.setupTouchNav(); this.setupResizeNav();
+    this.update(0);
+  }
+  setupNavDots() {
+    this.navDotsContainer.innerHTML = '';
+    this.slides.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'nav-dot'; d.setAttribute('aria-label', '第 ' + (i + 1) + ' 页');
+      d.addEventListener('click', () => this.goTo(i));
+      this.navDotsContainer.appendChild(d);
+    });
+  }
+  setupChapterTabs() {
+    document.querySelectorAll('.tn-ch').forEach(ch =>
+      ch.addEventListener('click', () => this.goTo(parseInt(ch.dataset.start))));
+  }
+  setupIntersectionObserver() {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        if (!this.navLock && e.intersectionRatio > 0.5) this.update(this.slides.indexOf(e.target));
+      }
+    }), { threshold: [0.25, 0.5, 0.75] });
+    this.slides.forEach(s => io.observe(s));
+  }
+  setupKeyboardNav() {
+    document.addEventListener('keydown', e => {
+      const k = e.key;
+      if (k==='ArrowDown'||k==='Down'||k==='ArrowRight'||k==='Right'||k==='PageDown'||k===' '||k==='Spacebar') { e.preventDefault(); this.goTo(this.currentSlide+1); }
+      else if (k==='ArrowUp'||k==='Up'||k==='ArrowLeft'||k==='Left'||k==='PageUp') { e.preventDefault(); this.goTo(this.currentSlide-1); }
+      else if (k==='Home') { e.preventDefault(); this.goTo(0); }
+      else if (k==='End') { e.preventDefault(); this.goTo(this.slides.length-1); }
+    });
+  }
+  setupWheelNav() {
+    window.addEventListener('wheel', e => {
+      if (this.isScrolling || Math.abs(e.deltaY) < 12) return;
+      this.isScrolling = true;
+      this.goTo(this.currentSlide + (e.deltaY > 0 ? 1 : -1));
+      setTimeout(() => { this.isScrolling = false; }, 700);
+    }, { passive: true });
+  }
+  setupResizeNav() {
+    let t = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        const target = this.slides[this.currentSlide].offsetTop;
+        if (Math.abs(window.scrollY - target) > 2) window.scrollTo({ top: target, behavior: 'instant' });
+      }, 150);
+    });
+  }
+  setupTouchNav() {
+    let sy = 0;
+    window.addEventListener('touchstart', e => { sy = e.touches[0].clientY; }, { passive: true });
+    window.addEventListener('touchend', e => {
+      const dy = sy - e.changedTouches[0].clientY;
+      if (Math.abs(dy) > 55) this.goTo(this.currentSlide + (dy > 0 ? 1 : -1));
+    }, { passive: true });
+  }
+  goTo(i) {
+    if (i < 0 || i >= this.slides.length) return;
+    this.navLock = true;
+    const target = this.slides[i].offsetTop, startY = window.scrollY;
+    window.scrollTo({ top: target, behavior: 'smooth' });
+    this.update(i);
+    clearTimeout(this._settleTimer); clearTimeout(this._navTimer);
+    /* Intervene only when the scroll has STALLED, never merely because it
+       hasn't arrived — cutting a healthy smooth scroll short strands the
+       page between slides. */
+    let last = startY, stalled = 0, ticks = 0;
+    const settle = () => {
+      const y = window.scrollY;
+      if (Math.abs(y - target) <= 2) return;
+      stalled = Math.abs(y - last) < 1 ? stalled + 1 : 0;
+      last = y;
+      if (stalled >= 3 || ++ticks > 25) {
+        window.scrollTo({ top: y, behavior: 'instant' });
+        window.scrollTo({ top: target, behavior: 'instant' });
+        return;
+      }
+      this._settleTimer = setTimeout(settle, 120);
+    };
+    this._settleTimer = setTimeout(settle, 120);
+    this._navTimer = setTimeout(() => { this.navLock = false; }, 900);
+  }
+  update(i) {
+    this.currentSlide = i;
+    const total = this.slides.length, pad = n => String(n).padStart(2, '0');
+    this.counter.textContent = pad(i + 1) + ' / ' + pad(total);
+    this.progressBar.style.width = ((i + 1) / total * 100) + '%';
+    this.navDotsContainer.querySelectorAll('.nav-dot').forEach((d, n) => d.classList.toggle('active', n === i));
+    this.updateChapters(i);
+  }
+  updateChapters(slideIndex) {
+    document.querySelectorAll('.tn-ch').forEach(ch => {
+      const s = parseInt(ch.dataset.start), e = parseInt(ch.dataset.end);
+      ch.classList.toggle('active', slideIndex >= s && slideIndex <= e);
+    });
+  }
+}
+const deck = new SlidePresentation();
+function goToSlide(i) { deck.goTo(i); }
+</script>
+</body>
+</html>
