@@ -112,18 +112,21 @@ ol li::before{content:counter(n); position:absolute; left:0; color:var(--purple)
 /* ===========================================
    CODE BLOCKS
    =========================================== */
-.code{position:relative; margin:12px 0 18px}
-.code pre{
+/* The copy button lives in its own strip ABOVE the code, never floating over
+   it: a long one-line command scrolls horizontally and would otherwise run
+   straight under an overlaid button. */
+.code{
+  position:relative; margin:12px 0 18px; padding-top:32px;
   background:var(--bg-code); border:1px solid var(--border); border-radius:8px;
-  padding:14px 52px 14px 16px; overflow-x:auto;
 }
+.code pre{background:none; border:none; padding:0 16px 14px; overflow-x:auto}
 .code code{font-family:var(--mono); font-size:.78rem; color:#d6d6e6; white-space:pre; line-height:1.7}
 .code .cm{color:#5a5a6e}
 .copy{
-  position:absolute; top:9px; right:9px;
+  position:absolute; top:7px; right:8px;
   background:var(--bg-card2); border:1px solid var(--border-med); border-radius:6px;
   color:var(--text-sec); font-family:var(--font); font-size:.62rem; font-weight:600;
-  padding:4px 9px; cursor:pointer; transition:all .18s;
+  padding:3px 9px; cursor:pointer; transition:all .18s;
 }
 .copy:hover{border-color:var(--purple-border); color:var(--text)}
 .copy.done{color:var(--purple); border-color:var(--purple-border)}
@@ -186,6 +189,32 @@ td strong{color:var(--text)}
 
 .bad{color:#e8737f}
 .good{color:#68d391}
+
+/* ===========================================
+   CLAUDE CODE WINDOW MOCK
+   A rendered stand-in for a screenshot — stays crisp at any zoom
+   and re-themes with the brand tokens.
+   =========================================== */
+.cc{border:1px solid var(--border-med); border-radius:10px; overflow:hidden; background:#0a0a0a; margin:14px 0 8px}
+.cc-bar{display:flex; align-items:center; gap:6px; padding:9px 13px; background:#141414; border-bottom:1px solid var(--border)}
+.cc-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0}
+.cc-name{margin-left:8px; font-family:var(--mono); font-size:.62rem; color:var(--text-muted)}
+.cc-body{padding:14px 16px; font-family:var(--mono); font-size:.74rem; line-height:1.9; overflow-x:auto}
+.cc-body>*{white-space:pre-wrap; word-break:break-word}
+.cc-in{color:#fff}
+.cc-in::before{content:'> '; color:var(--purple); font-weight:700}
+.cc-run{color:var(--text-sec); margin-top:10px}
+.cc-run::before{content:'⏺ '; color:var(--purple)}
+.cc-run b{color:#c9c9dd; font-weight:500}
+.cc-out{color:var(--text-muted); padding-left:16px; margin-bottom:2px}
+.cc-ok{color:#68d391; margin-top:10px}
+.cc-say{color:var(--text-sec); margin-top:10px}
+.cc-say::before{content:'⏺ '; color:var(--purple)}
+.cc-li{color:var(--text-sec); padding-left:16px}
+.cc-cur{display:inline-block; width:7px; height:12px; background:var(--purple); vertical-align:-1px; animation:blink 1.1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+.cap{font-size:.7rem; color:var(--text-muted); margin-bottom:18px}
+@media (prefers-reduced-motion:reduce){ .cc-cur{animation:none} }
 
 /* ===========================================
    TREE
@@ -251,11 +280,7 @@ footer{
     <a href="#flow">Claude 的四个阶段</a>
     <a href="#output">生成效果</a>
     <a href="#nav">导航条规则</a>
-    <a href="#keys">放映操作</a>
     <a href="#export">导出与部署</a>
-    <a href="#files">文件结构</a>
-    <a href="#customize">定制</a>
-    <a href="#trouble">故障排查</a>
   </nav>
 
   <main class="main">
@@ -301,21 +326,54 @@ footer{
     <section id="install">
       <h2><span class="num">02</span>安装</h2>
       <div class="glow-line"></div>
-      <p>克隆到 Claude Code 的技能目录即可，<strong>无需重启</strong>，Claude 会自动识别。</p>
+      <p>
+        打开 Claude Code，把下面这行<strong>直接粘给 Claude</strong>，让它替你执行 ——
+        不用自己开终端，也不用重启，装完立刻能用。
+      </p>
+
       <div class="code">
         <button class="copy">复制</button>
         <pre><code>git clone https://github.com/beyalee/cobo-ppt-html-skill ~/.claude/skills/cobo-slides</code></pre>
       </div>
-      <div class="hbox warn">
-        <span class="k">注意</span> 仓库原名 <code class="inline">cobo-slides</code>，现已更名为
-        <code class="inline">cobo-ppt-html-skill</code>。旧地址目前靠 GitHub 重定向仍可 clone，
-        但建议直接用新地址。<strong>本地目录名仍用 <code class="inline">cobo-slides</code></strong> ——
-        技能名由目录名决定。
+
+      <div class="cc">
+        <div class="cc-bar">
+          <span class="cc-dot" style="background:#ff5f57"></span>
+          <span class="cc-dot" style="background:#febc2e"></span>
+          <span class="cc-dot" style="background:#28c840"></span>
+          <span class="cc-name">Claude Code</span>
+        </div>
+        <div class="cc-body">
+<div class="cc-in">git clone https://github.com/beyalee/cobo-ppt-html-skill ~/.claude/skills/cobo-slides</div>
+<div class="cc-run">Bash(<b>git clone … ~/.claude/skills/cobo-slides</b>)</div>
+<div class="cc-out">Cloning into '/Users/you/.claude/skills/cobo-slides'...</div>
+<div class="cc-out">Resolving deltas: 100% — done.</div>
+<div class="cc-ok">✓ 技能 cobo-slides 已就绪，无需重启。</div>
+        </div>
       </div>
+      <div class="cap">↑ 粘进去、回车，大概十几秒就完事了。</div>
+
+      <div class="hbox">
+        <strong>目录名要用 <code class="inline">cobo-slides</code></strong> ——
+        Claude Code 拿<strong>文件夹名</strong>当技能名。克隆到别的名字，技能就叫那个名字了，
+        所以上面命令末尾的路径请照抄。
+      </div>
+
+      <h3>装好之后怎么确认</h3>
+      <p>在 Claude Code 里输入 <code class="inline">/</code>，列表里应该能看到 <code class="inline">cobo-slides</code>。看不到就重开一个会话。</p>
+
       <h3>更新到最新版</h3>
       <div class="code">
         <button class="copy">复制</button>
         <pre><code>git -C ~/.claude/skills/cobo-slides pull</code></pre>
+      </div>
+      <p>
+        如果你在改名前就装过，<code class="inline">pull</code> 时会多出一行
+        <code class="inline">This repository moved</code> 的提示 —— 不影响使用，想清掉就更新一次地址：
+      </p>
+      <div class="code">
+        <button class="copy">复制</button>
+        <pre><code>git -C ~/.claude/skills/cobo-slides remote set-url origin https://github.com/beyalee/cobo-ppt-html-skill</code></pre>
       </div>
     </section>
 
@@ -325,11 +383,25 @@ footer{
       <div class="glow-line"></div>
 
       <h3>① 只给主题，让它全写</h3>
-      <p>最省事。Claude 会先问受众、页数、章节，再动手。</p>
-      <div class="code">
-        <button class="copy">复制</button>
-        <pre><code>帮我做一个 Cobo MPC 钱包的客户演示</code></pre>
+      <p>最省事。一句话丢进去，Claude 会先问清楚再动手：</p>
+
+      <div class="cc">
+        <div class="cc-bar">
+          <span class="cc-dot" style="background:#ff5f57"></span>
+          <span class="cc-dot" style="background:#febc2e"></span>
+          <span class="cc-dot" style="background:#28c840"></span>
+          <span class="cc-name">Claude Code</span>
+        </div>
+        <div class="cc-body">
+<div class="cc-in">帮我做一个 Cobo MPC 钱包的客户演示</div>
+<div class="cc-say">先跟你确认几件事：</div>
+<div class="cc-li">1. 面向谁？　客户 / 内部团队 / 合作伙伴 / 大会演讲</div>
+<div class="cc-li">2. 要多少页？短 5-10 · 中 10-20 · 长 20+</div>
+<div class="cc-li">3. 章节你来定，还是我按主题推荐？</div>
+<div class="cc-say">确认后我会先给大纲，你点头再生成。<span class="cc-cur"></span></div>
+        </div>
       </div>
+      <div class="cap">↑ 它不会闷头就写，中间有两次让你拍板的机会。</div>
 
       <h3>② 给大纲或全文，只要排版</h3>
       <p>你已经想清楚讲什么，把要点贴给它，它负责版式与视觉。</p>
@@ -441,30 +513,10 @@ footer{
       </div>
     </section>
 
-    <!-- ============ 7 ============ -->
-    <section id="keys">
-      <h2><span class="num">07</span>放映操作</h2>
-      <div class="glow-line"></div>
-      <div class="tw">
-        <table>
-          <thead><tr><th>操作</th><th>作用</th></tr></thead>
-          <tbody>
-            <tr><td><strong>↓ / → / 空格 / PageDown</strong></td><td>下一页</td></tr>
-            <tr><td><strong>↑ / ← / PageUp</strong></td><td>上一页</td></tr>
-            <tr><td><strong>Home / End</strong></td><td>首页 / 末页</td></tr>
-            <tr><td><strong>滚轮</strong></td><td>一次手势翻一页（已节流）</td></tr>
-            <tr><td><strong>触屏上下滑</strong></td><td>翻页</td></tr>
-            <tr><td><strong>点顶部章节 Tab</strong></td><td>跳到该章第一页</td></tr>
-            <tr><td><strong>点右侧圆点</strong></td><td>跳到指定页</td></tr>
-            <tr><td><strong>点左上 Logo</strong></td><td>回封面</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
 
     <!-- ============ 8 ============ -->
     <section id="export">
-      <h2><span class="num">08</span>导出与部署</h2>
+      <h2><span class="num">07</span>导出与部署</h2>
       <div class="glow-line"></div>
       <h3>导出 PDF</h3>
       <p>用 Playwright 逐页截取，首次运行会自动装依赖（需要 Node.js）。</p>
@@ -484,95 +536,8 @@ footer{
       </div>
     </section>
 
-    <!-- ============ 9 ============ -->
-    <section id="files">
-      <h2><span class="num">09</span>文件结构</h2>
-      <div class="glow-line"></div>
-      <div class="tree">
-<code>cobo-slides/
-├── SKILL.md              <span class="c"># 主流程：四个阶段 + 导航条规则</span>
-├── COBO_BRAND.md         <span class="c"># 品牌规范：CSS 变量 + 组件库 + 图标 + 产品词汇表</span>
-├── viewport-base.css     <span class="c"># 强制响应式基础样式（必须整段嵌入）</span>
-├── html-template.md      <span class="c"># JS 控制器完整实现 + 踩坑对照表</span>
-├── animation-patterns.md <span class="c"># 动画片段参考</span>
-├── guide.html            <span class="c"># 本文档</span>
-└── scripts/
-    ├── export-pdf.sh     <span class="c"># 导出 PDF</span>
-    └── deploy.sh         <span class="c"># 部署到 Vercel</span></code>
-      </div>
-    </section>
 
-    <!-- ============ 10 ============ -->
-    <section id="customize">
-      <h2><span class="num">10</span>定制</h2>
-      <div class="glow-line"></div>
-      <div class="g2">
-        <div class="card">
-          <div class="card-t">改品牌色 / 加组件</div>
-          <p>编辑 <code class="inline">COBO_BRAND.md</code>。Claude 每次生成前都会读最新版本，改完立即生效。</p>
-        </div>
-        <div class="card">
-          <div class="card-t">改流程 / 改规则</div>
-          <p>编辑 <code class="inline">SKILL.md</code>。比如想调整章节数上限、密度限制或提问方式。</p>
-        </div>
-      </div>
-      <p>改完记得提交，团队其他人 <code class="inline">git pull</code> 就同步了。</p>
-    </section>
 
-    <!-- ============ 11 ============ -->
-    <section id="trouble">
-      <h2><span class="num">11</span>故障排查</h2>
-      <div class="glow-line"></div>
-      <p>下面几个是这套模板真实踩过的坑，修复已写进 <code class="inline">html-template.md</code> 与 <code class="inline">viewport-base.css</code>。自己改代码时留意别改回去。</p>
-      <div class="tw">
-        <table>
-          <thead><tr><th>症状</th><th>原因</th><th>修法</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>页码和 Tab 变了，<strong>页面不动</strong></td>
-              <td><code class="inline">body</code> 上的 <code class="inline">overflow-x:hidden</code> 按规范把 <code class="inline">overflow-y</code> 强制成 <code class="inline">auto</code>，body 成了第二个滚动容器</td>
-              <td>overflow 和 <code class="inline">height:100%</code> 只放 <code class="inline">html</code></td>
-            </tr>
-            <tr>
-              <td>只有第一页，后面全没了</td>
-              <td><code class="inline">body{height:100%}</code> 把内容裁到一屏</td>
-              <td>改 <code class="inline">min-height:100%</code></td>
-            </tr>
-            <tr>
-              <td>内容左偏、出现横向滚动条</td>
-              <td><code class="inline">.slide{width:100vw}</code> —— <code class="inline">100vw</code> 含滚动条宽度</td>
-              <td>改 <code class="inline">width:100%</code></td>
-            </tr>
-            <tr>
-              <td>导航高亮的不是当前页</td>
-              <td>IntersectionObserver 在滚动途中覆盖了 <code class="inline">currentSlide</code></td>
-              <td><code class="inline">navLock</code> 标志位</td>
-            </tr>
-            <tr>
-              <td>停在两页中间</td>
-              <td>兜底逻辑按"是否到达"触发，打断了正常的平滑滚动</td>
-              <td>改成按"是否没动"触发</td>
-            </tr>
-            <tr>
-              <td>手机上导航只剩 <code class="inline">01 02 03</code></td>
-              <td>窄屏把 <code class="inline">.tn-ch-name</code> 藏了</td>
-              <td>该藏的是 <code class="inline">.tn-ch-num</code></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <h3>自检两条</h3>
-      <p>生成后在控制台跑一下，都为 <code class="inline">true</code> 才算过：</p>
-      <div class="code">
-        <button class="copy">复制</button>
-        <pre><code><span class="cm">// 1. 每次跳转都精确停在页首</span>
-deck.goTo(5); <span class="cm">// 等 2 秒后</span>
-window.scrollY === deck.slides[5].offsetTop
-
-<span class="cm">// 2. 没有横向溢出</span>
-document.documentElement.scrollWidth === document.documentElement.clientWidth</code></pre>
-      </div>
-    </section>
 
     <footer>
       Cobo Slides · Claude Code Skill ·
